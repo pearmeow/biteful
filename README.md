@@ -7,11 +7,12 @@ An app that promotes healthy eating.
 ## Instructions
 
 ---
+
 These instructions were tested on Linux (Ubuntu/Debian) machines.
 
 1. Install Frontend Dependencies (Node.js)
 
-  Vite and React require **Node.js** and **npm**
+    Vite and React require **Node.js** and **npm**
 
     ```bash
     sudo apt install nodejs npm
