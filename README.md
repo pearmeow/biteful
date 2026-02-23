@@ -9,51 +9,51 @@ An app that promotes healthy eating.
 ---
 These instructions were tested on Linux (Ubuntu/Debian) machines.
 
-### Install Frontend Dependencies (Node.js)
+1. Install Frontend Dependencies (Node.js)
 
-Vite and React require **Node.js** and **npm** (Node Package Manager)
+  Vite and React require **Node.js** and **npm** (Node Package Manager)
 
-```bash
-sudo apt install nodejs npm
-```
+    ```bash
+    sudo apt install nodejs npm
+    ```
 
-### Install Backend Dependencies (C++, Drogon)
+2. Install Backend Dependencies (C++, Drogon)
 
-A C++17 (or higher) compiler and `cmake` is required.
+    A C++17 (or higher) compiler and `cmake` is required.
 
-```bash
-sudo apt install git gcc g++ cmake
-```
+    ```bash
+    sudo apt install git gcc g++ cmake
+    ```
 
-Drogon relies on the `jsoncpp`, `uuid`, and `zlib`.
+    Drogon relies on the `jsoncpp`, `uuid`, and `zlib`.
 
-```bash
-sudo apt install libjsoncpp-dev uuid-dev zlib1g-dev libssl-dev
-```
+    ```bash
+    sudo apt install libjsoncpp-dev uuid-dev zlib1g-dev libssl-dev
+    ```
 
-Installing the drogon framework so that `drogon_ctl` can be used.
+    Installing the drogon framework so that `drogon_ctl` can be used.
 
-```bash
-git clone https://github.com/drogonframework/drogon
-cd drogon
-git submodule update --init
-mkdir build
-cd build
-cmake ..
-make && sudo make install
-```
+    ```bash
+    git clone https://github.com/drogonframework/drogon
+    cd drogon
+    git submodule update --init
+    mkdir build
+    cd build
+    cmake ..
+    make && sudo make install
+    ```
 
-### Launching the Project
+3. Launching the Project
 
-Navigate into the project's backend folder and compile using:
+    Navigate into the project's backend folder and compile using:
 
-```bash
-mkdir build
-cd build
-cmake ..
-make
-./backend
-```
+    ```bash
+    mkdir build
+    cd build
+    cmake ..
+    make
+    ./backend
+    ```
 
 ## Authors
 
