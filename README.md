@@ -32,12 +32,13 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     sudo apt install git gcc g++ cmake
     ```
 
-    Drogon relies on the `jsoncpp`, `uuid`, and `zlib`.
+    Drogon relies on the `jsoncpp`, `uuid`, `zlib`, and 'yaml'.
 
     ```bash
-    sudo apt install libjsoncpp-dev uuid-dev zlib1g-dev libssl-dev
+    sudo apt install libjsoncpp-dev uuid-dev zlib1g-dev libssl-dev libyaml-cpp-dev 
     ```
 
+    Navigate outside of the Biteful folder.
     Install the drogon framework so that `drogon_ctl` can be used.
 
     ```bash
