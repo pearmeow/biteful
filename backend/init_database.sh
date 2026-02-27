@@ -8,9 +8,13 @@ else
     exit 1
 fi
 
+if [ ! -d "./migrations" ]; then
+    echo "Error: Migrations directory './migrations' not found!"
+    exit 1
+fi
+
 # 2. Create/Update the .pgpass file
 # Format: hostname:port:database:username:password
-# We add entries for both 'postgres' (for reset) and your app DB
 PGPASS_PATH="$HOME/.pgpass"
 
 echo "Configuring .pgpass for secure authentication..."
@@ -24,13 +28,11 @@ psql -h 127.0.0.1 -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME
 psql -h 127.0.0.1 -U "$DB_USER" -d postgres -c "CREATE DATABASE $DB_NAME;"
 
 # 4. Apply Migrations
-if [ -d "./migrations" ]; then
-    echo "Applying migrations from ./migrations..."
-    for file in ./migrations/*.sql; do
-        echo "Running $file..."
-        psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" -f "$file"
-    done
-fi
+echo "Applying migrations from ./migrations..."
+for file in ./migrations/*.sql; do
+    echo "Running $file..."
+    psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" -f "$file"
+done
 
 # 5. Setup Models Directory
 rm -rf ./models
