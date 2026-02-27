@@ -44,7 +44,7 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     sudo -u postgres psql
     ```
 
-    In your `sql` terminal run the following commands.
+    In your `psql` terminal run the following commands.
 
     ```sql
     # Replace user and password with your choice
@@ -54,12 +54,13 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     ALTER ROLE user CREATEDB;
     ```
 
-    Your `.env` file should be located in `~/biteful/backend` and look something like the following. Make sure the user and password match what you set above.
+    Your `.env` file should be located in `~/biteful/backend` and look something
+    like the following. Make sure the user and password match what you set above.
 
     ```bash
     DB_NAME=biteful
     DB_USER=user
-    DB_password=password
+    DB_PASSWORD=password
     ```
 
 5. Install Backend Dependencies (C++, Drogon)
@@ -73,7 +74,8 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     Drogon relies on `jsoncpp`, `uuid`, `zlib`, and `yaml`.
 
     ```bash
-    sudo apt install libjsoncpp-dev uuid-dev zlib1g-dev libssl-dev libyaml-cpp-dev 
+    sudo apt install libjsoncpp-dev uuid-dev \
+    zlib1g-dev libssl-dev libyaml-cpp-dev 
     ```
 
     Install the drogon framework so that `drogon_ctl` can be used.
@@ -123,7 +125,8 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
 
 ## Other Operating Systems
 
-For other operating systems, installing the tools may be slightly different. Please refer to their documentation.
+For other operating systems, installing the tools may be slightly different.
+Please refer to their documentation.
 
 ## Authors
 
