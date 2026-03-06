@@ -21,19 +21,27 @@ const std::string FoodPantries::Cols::_close_time = "\"close_time\"";
 const std::string FoodPantries::Cols::_address = "\"address\"";
 const std::string FoodPantries::Cols::_latitude = "\"latitude\"";
 const std::string FoodPantries::Cols::_longitude = "\"longitude\"";
+const std::string FoodPantries::Cols::_meal_type = "\"meal_type\"";
+const std::string FoodPantries::Cols::_frequency = "\"frequency\"";
+const std::string FoodPantries::Cols::_phone = "\"phone\"";
+const std::string FoodPantries::Cols::_program = "\"program\"";
 const std::string FoodPantries::primaryKeyName = "id";
 const bool FoodPantries::hasPrimaryKey = true;
 const std::string FoodPantries::tableName = "\"food_pantries\"";
 
 const std::vector<typename FoodPantries::MetaData> FoodPantries::metaData_={
 {"id","int32_t","integer",4,1,1,1},
-{"agency","std::string","text",0,0,0,0},
-{"day_of_week","std::string","text",0,0,0,0},
-{"open_time","std::string","text",0,0,0,0},
-{"close_time","std::string","text",0,0,0,0},
+{"agency","std::string","text",0,0,0,1},
+{"day_of_week","std::string","text",0,0,0,1},
+{"open_time","std::string","time without time zone",0,0,0,0},
+{"close_time","std::string","time without time zone",0,0,0,0},
 {"address","std::string","text",0,0,0,0},
 {"latitude","double","double precision",8,0,0,0},
-{"longitude","double","double precision",8,0,0,0}
+{"longitude","double","double precision",8,0,0,0},
+{"meal_type","std::string","text",0,0,0,0},
+{"frequency","std::string","text",0,0,0,0},
+{"phone","std::string","text",0,0,0,0},
+{"program","std::string","text",0,0,0,0}
 };
 const std::string &FoodPantries::getColumnName(size_t index) noexcept(false)
 {
@@ -76,11 +84,27 @@ FoodPantries::FoodPantries(const Row &r, const ssize_t indexOffset) noexcept
         {
             longitude_=std::make_shared<double>(r["longitude"].as<double>());
         }
+        if(!r["meal_type"].isNull())
+        {
+            mealType_=std::make_shared<std::string>(r["meal_type"].as<std::string>());
+        }
+        if(!r["frequency"].isNull())
+        {
+            frequency_=std::make_shared<std::string>(r["frequency"].as<std::string>());
+        }
+        if(!r["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(r["phone"].as<std::string>());
+        }
+        if(!r["program"].isNull())
+        {
+            program_=std::make_shared<std::string>(r["program"].as<std::string>());
+        }
     }
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 8 > r.size())
+        if(offset + 12 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -126,13 +150,33 @@ FoodPantries::FoodPantries(const Row &r, const ssize_t indexOffset) noexcept
         {
             longitude_=std::make_shared<double>(r[index].as<double>());
         }
+        index = offset + 8;
+        if(!r[index].isNull())
+        {
+            mealType_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 9;
+        if(!r[index].isNull())
+        {
+            frequency_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 10;
+        if(!r[index].isNull())
+        {
+            phone_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 11;
+        if(!r[index].isNull())
+        {
+            program_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
     }
 
 }
 
 FoodPantries::FoodPantries(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 8)
+    if(pMasqueradingVector.size() != 12)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -199,6 +243,38 @@ FoodPantries::FoodPantries(const Json::Value &pJson, const std::vector<std::stri
         if(!pJson[pMasqueradingVector[7]].isNull())
         {
             longitude_=std::make_shared<double>(pJson[pMasqueradingVector[7]].asDouble());
+        }
+    }
+    if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson[pMasqueradingVector[8]].isNull())
+        {
+            mealType_=std::make_shared<std::string>(pJson[pMasqueradingVector[8]].asString());
+        }
+    }
+    if(!pMasqueradingVector[9].empty() && pJson.isMember(pMasqueradingVector[9]))
+    {
+        dirtyFlag_[9] = true;
+        if(!pJson[pMasqueradingVector[9]].isNull())
+        {
+            frequency_=std::make_shared<std::string>(pJson[pMasqueradingVector[9]].asString());
+        }
+    }
+    if(!pMasqueradingVector[10].empty() && pJson.isMember(pMasqueradingVector[10]))
+    {
+        dirtyFlag_[10] = true;
+        if(!pJson[pMasqueradingVector[10]].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson[pMasqueradingVector[10]].asString());
+        }
+    }
+    if(!pMasqueradingVector[11].empty() && pJson.isMember(pMasqueradingVector[11]))
+    {
+        dirtyFlag_[11] = true;
+        if(!pJson[pMasqueradingVector[11]].isNull())
+        {
+            program_=std::make_shared<std::string>(pJson[pMasqueradingVector[11]].asString());
         }
     }
 }
@@ -269,12 +345,44 @@ FoodPantries::FoodPantries(const Json::Value &pJson) noexcept(false)
             longitude_=std::make_shared<double>(pJson["longitude"].asDouble());
         }
     }
+    if(pJson.isMember("meal_type"))
+    {
+        dirtyFlag_[8]=true;
+        if(!pJson["meal_type"].isNull())
+        {
+            mealType_=std::make_shared<std::string>(pJson["meal_type"].asString());
+        }
+    }
+    if(pJson.isMember("frequency"))
+    {
+        dirtyFlag_[9]=true;
+        if(!pJson["frequency"].isNull())
+        {
+            frequency_=std::make_shared<std::string>(pJson["frequency"].asString());
+        }
+    }
+    if(pJson.isMember("phone"))
+    {
+        dirtyFlag_[10]=true;
+        if(!pJson["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson["phone"].asString());
+        }
+    }
+    if(pJson.isMember("program"))
+    {
+        dirtyFlag_[11]=true;
+        if(!pJson["program"].isNull())
+        {
+            program_=std::make_shared<std::string>(pJson["program"].asString());
+        }
+    }
 }
 
 void FoodPantries::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 8)
+    if(pMasqueradingVector.size() != 12)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -340,6 +448,38 @@ void FoodPantries::updateByMasqueradedJson(const Json::Value &pJson,
         if(!pJson[pMasqueradingVector[7]].isNull())
         {
             longitude_=std::make_shared<double>(pJson[pMasqueradingVector[7]].asDouble());
+        }
+    }
+    if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson[pMasqueradingVector[8]].isNull())
+        {
+            mealType_=std::make_shared<std::string>(pJson[pMasqueradingVector[8]].asString());
+        }
+    }
+    if(!pMasqueradingVector[9].empty() && pJson.isMember(pMasqueradingVector[9]))
+    {
+        dirtyFlag_[9] = true;
+        if(!pJson[pMasqueradingVector[9]].isNull())
+        {
+            frequency_=std::make_shared<std::string>(pJson[pMasqueradingVector[9]].asString());
+        }
+    }
+    if(!pMasqueradingVector[10].empty() && pJson.isMember(pMasqueradingVector[10]))
+    {
+        dirtyFlag_[10] = true;
+        if(!pJson[pMasqueradingVector[10]].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson[pMasqueradingVector[10]].asString());
+        }
+    }
+    if(!pMasqueradingVector[11].empty() && pJson.isMember(pMasqueradingVector[11]))
+    {
+        dirtyFlag_[11] = true;
+        if(!pJson[pMasqueradingVector[11]].isNull())
+        {
+            program_=std::make_shared<std::string>(pJson[pMasqueradingVector[11]].asString());
         }
     }
 }
@@ -409,6 +549,38 @@ void FoodPantries::updateByJson(const Json::Value &pJson) noexcept(false)
             longitude_=std::make_shared<double>(pJson["longitude"].asDouble());
         }
     }
+    if(pJson.isMember("meal_type"))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson["meal_type"].isNull())
+        {
+            mealType_=std::make_shared<std::string>(pJson["meal_type"].asString());
+        }
+    }
+    if(pJson.isMember("frequency"))
+    {
+        dirtyFlag_[9] = true;
+        if(!pJson["frequency"].isNull())
+        {
+            frequency_=std::make_shared<std::string>(pJson["frequency"].asString());
+        }
+    }
+    if(pJson.isMember("phone"))
+    {
+        dirtyFlag_[10] = true;
+        if(!pJson["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson["phone"].asString());
+        }
+    }
+    if(pJson.isMember("program"))
+    {
+        dirtyFlag_[11] = true;
+        if(!pJson["program"].isNull())
+        {
+            program_=std::make_shared<std::string>(pJson["program"].asString());
+        }
+    }
 }
 
 const int32_t &FoodPantries::getValueOfId() const noexcept
@@ -454,11 +626,6 @@ void FoodPantries::setAgency(std::string &&pAgency) noexcept
     agency_ = std::make_shared<std::string>(std::move(pAgency));
     dirtyFlag_[1] = true;
 }
-void FoodPantries::setAgencyToNull() noexcept
-{
-    agency_.reset();
-    dirtyFlag_[1] = true;
-}
 
 const std::string &FoodPantries::getValueOfDayOfWeek() const noexcept
 {
@@ -479,11 +646,6 @@ void FoodPantries::setDayOfWeek(const std::string &pDayOfWeek) noexcept
 void FoodPantries::setDayOfWeek(std::string &&pDayOfWeek) noexcept
 {
     dayOfWeek_ = std::make_shared<std::string>(std::move(pDayOfWeek));
-    dirtyFlag_[2] = true;
-}
-void FoodPantries::setDayOfWeekToNull() noexcept
-{
-    dayOfWeek_.reset();
     dirtyFlag_[2] = true;
 }
 
@@ -612,6 +774,114 @@ void FoodPantries::setLongitudeToNull() noexcept
     dirtyFlag_[7] = true;
 }
 
+const std::string &FoodPantries::getValueOfMealType() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(mealType_)
+        return *mealType_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &FoodPantries::getMealType() const noexcept
+{
+    return mealType_;
+}
+void FoodPantries::setMealType(const std::string &pMealType) noexcept
+{
+    mealType_ = std::make_shared<std::string>(pMealType);
+    dirtyFlag_[8] = true;
+}
+void FoodPantries::setMealType(std::string &&pMealType) noexcept
+{
+    mealType_ = std::make_shared<std::string>(std::move(pMealType));
+    dirtyFlag_[8] = true;
+}
+void FoodPantries::setMealTypeToNull() noexcept
+{
+    mealType_.reset();
+    dirtyFlag_[8] = true;
+}
+
+const std::string &FoodPantries::getValueOfFrequency() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(frequency_)
+        return *frequency_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &FoodPantries::getFrequency() const noexcept
+{
+    return frequency_;
+}
+void FoodPantries::setFrequency(const std::string &pFrequency) noexcept
+{
+    frequency_ = std::make_shared<std::string>(pFrequency);
+    dirtyFlag_[9] = true;
+}
+void FoodPantries::setFrequency(std::string &&pFrequency) noexcept
+{
+    frequency_ = std::make_shared<std::string>(std::move(pFrequency));
+    dirtyFlag_[9] = true;
+}
+void FoodPantries::setFrequencyToNull() noexcept
+{
+    frequency_.reset();
+    dirtyFlag_[9] = true;
+}
+
+const std::string &FoodPantries::getValueOfPhone() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(phone_)
+        return *phone_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &FoodPantries::getPhone() const noexcept
+{
+    return phone_;
+}
+void FoodPantries::setPhone(const std::string &pPhone) noexcept
+{
+    phone_ = std::make_shared<std::string>(pPhone);
+    dirtyFlag_[10] = true;
+}
+void FoodPantries::setPhone(std::string &&pPhone) noexcept
+{
+    phone_ = std::make_shared<std::string>(std::move(pPhone));
+    dirtyFlag_[10] = true;
+}
+void FoodPantries::setPhoneToNull() noexcept
+{
+    phone_.reset();
+    dirtyFlag_[10] = true;
+}
+
+const std::string &FoodPantries::getValueOfProgram() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(program_)
+        return *program_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &FoodPantries::getProgram() const noexcept
+{
+    return program_;
+}
+void FoodPantries::setProgram(const std::string &pProgram) noexcept
+{
+    program_ = std::make_shared<std::string>(pProgram);
+    dirtyFlag_[11] = true;
+}
+void FoodPantries::setProgram(std::string &&pProgram) noexcept
+{
+    program_ = std::make_shared<std::string>(std::move(pProgram));
+    dirtyFlag_[11] = true;
+}
+void FoodPantries::setProgramToNull() noexcept
+{
+    program_.reset();
+    dirtyFlag_[11] = true;
+}
+
 void FoodPantries::updateId(const uint64_t id)
 {
 }
@@ -625,7 +895,11 @@ const std::vector<std::string> &FoodPantries::insertColumns() noexcept
         "close_time",
         "address",
         "latitude",
-        "longitude"
+        "longitude",
+        "meal_type",
+        "frequency",
+        "phone",
+        "program"
     };
     return inCols;
 }
@@ -709,6 +983,50 @@ void FoodPantries::outputArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
+    if(dirtyFlag_[8])
+    {
+        if(getMealType())
+        {
+            binder << getValueOfMealType();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[9])
+    {
+        if(getFrequency())
+        {
+            binder << getValueOfFrequency();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[10])
+    {
+        if(getPhone())
+        {
+            binder << getValueOfPhone();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[11])
+    {
+        if(getProgram())
+        {
+            binder << getValueOfProgram();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
 }
 
 const std::vector<std::string> FoodPantries::updateColumns() const
@@ -741,6 +1059,22 @@ const std::vector<std::string> FoodPantries::updateColumns() const
     if(dirtyFlag_[7])
     {
         ret.push_back(getColumnName(7));
+    }
+    if(dirtyFlag_[8])
+    {
+        ret.push_back(getColumnName(8));
+    }
+    if(dirtyFlag_[9])
+    {
+        ret.push_back(getColumnName(9));
+    }
+    if(dirtyFlag_[10])
+    {
+        ret.push_back(getColumnName(10));
+    }
+    if(dirtyFlag_[11])
+    {
+        ret.push_back(getColumnName(11));
     }
     return ret;
 }
@@ -824,6 +1158,50 @@ void FoodPantries::updateArgs(drogon::orm::internal::SqlBinder &binder) const
             binder << nullptr;
         }
     }
+    if(dirtyFlag_[8])
+    {
+        if(getMealType())
+        {
+            binder << getValueOfMealType();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[9])
+    {
+        if(getFrequency())
+        {
+            binder << getValueOfFrequency();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[10])
+    {
+        if(getPhone())
+        {
+            binder << getValueOfPhone();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[11])
+    {
+        if(getProgram())
+        {
+            binder << getValueOfProgram();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
 }
 Json::Value FoodPantries::toJson() const
 {
@@ -892,6 +1270,38 @@ Json::Value FoodPantries::toJson() const
     {
         ret["longitude"]=Json::Value();
     }
+    if(getMealType())
+    {
+        ret["meal_type"]=getValueOfMealType();
+    }
+    else
+    {
+        ret["meal_type"]=Json::Value();
+    }
+    if(getFrequency())
+    {
+        ret["frequency"]=getValueOfFrequency();
+    }
+    else
+    {
+        ret["frequency"]=Json::Value();
+    }
+    if(getPhone())
+    {
+        ret["phone"]=getValueOfPhone();
+    }
+    else
+    {
+        ret["phone"]=Json::Value();
+    }
+    if(getProgram())
+    {
+        ret["program"]=getValueOfProgram();
+    }
+    else
+    {
+        ret["program"]=Json::Value();
+    }
     return ret;
 }
 
@@ -904,7 +1314,7 @@ Json::Value FoodPantries::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 8)
+    if(pMasqueradingVector.size() == 12)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -994,6 +1404,50 @@ Json::Value FoodPantries::toMasqueradedJson(
                 ret[pMasqueradingVector[7]]=Json::Value();
             }
         }
+        if(!pMasqueradingVector[8].empty())
+        {
+            if(getMealType())
+            {
+                ret[pMasqueradingVector[8]]=getValueOfMealType();
+            }
+            else
+            {
+                ret[pMasqueradingVector[8]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[9].empty())
+        {
+            if(getFrequency())
+            {
+                ret[pMasqueradingVector[9]]=getValueOfFrequency();
+            }
+            else
+            {
+                ret[pMasqueradingVector[9]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[10].empty())
+        {
+            if(getPhone())
+            {
+                ret[pMasqueradingVector[10]]=getValueOfPhone();
+            }
+            else
+            {
+                ret[pMasqueradingVector[10]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[11].empty())
+        {
+            if(getProgram())
+            {
+                ret[pMasqueradingVector[11]]=getValueOfProgram();
+            }
+            else
+            {
+                ret[pMasqueradingVector[11]]=Json::Value();
+            }
+        }
         return ret;
     }
     LOG_ERROR << "Masquerade failed";
@@ -1061,6 +1515,38 @@ Json::Value FoodPantries::toMasqueradedJson(
     {
         ret["longitude"]=Json::Value();
     }
+    if(getMealType())
+    {
+        ret["meal_type"]=getValueOfMealType();
+    }
+    else
+    {
+        ret["meal_type"]=Json::Value();
+    }
+    if(getFrequency())
+    {
+        ret["frequency"]=getValueOfFrequency();
+    }
+    else
+    {
+        ret["frequency"]=Json::Value();
+    }
+    if(getPhone())
+    {
+        ret["phone"]=getValueOfPhone();
+    }
+    else
+    {
+        ret["phone"]=Json::Value();
+    }
+    if(getProgram())
+    {
+        ret["program"]=getValueOfProgram();
+    }
+    else
+    {
+        ret["program"]=Json::Value();
+    }
     return ret;
 }
 
@@ -1076,10 +1562,20 @@ bool FoodPantries::validateJsonForCreation(const Json::Value &pJson, std::string
         if(!validJsonOfField(1, "agency", pJson["agency"], err, true))
             return false;
     }
+    else
+    {
+        err="The agency column cannot be null";
+        return false;
+    }
     if(pJson.isMember("day_of_week"))
     {
         if(!validJsonOfField(2, "day_of_week", pJson["day_of_week"], err, true))
             return false;
+    }
+    else
+    {
+        err="The day_of_week column cannot be null";
+        return false;
     }
     if(pJson.isMember("open_time"))
     {
@@ -1106,13 +1602,33 @@ bool FoodPantries::validateJsonForCreation(const Json::Value &pJson, std::string
         if(!validJsonOfField(7, "longitude", pJson["longitude"], err, true))
             return false;
     }
+    if(pJson.isMember("meal_type"))
+    {
+        if(!validJsonOfField(8, "meal_type", pJson["meal_type"], err, true))
+            return false;
+    }
+    if(pJson.isMember("frequency"))
+    {
+        if(!validJsonOfField(9, "frequency", pJson["frequency"], err, true))
+            return false;
+    }
+    if(pJson.isMember("phone"))
+    {
+        if(!validJsonOfField(10, "phone", pJson["phone"], err, true))
+            return false;
+    }
+    if(pJson.isMember("program"))
+    {
+        if(!validJsonOfField(11, "program", pJson["program"], err, true))
+            return false;
+    }
     return true;
 }
 bool FoodPantries::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                       const std::vector<std::string> &pMasqueradingVector,
                                                       std::string &err)
 {
-    if(pMasqueradingVector.size() != 8)
+    if(pMasqueradingVector.size() != 12)
     {
         err = "Bad masquerading vector";
         return false;
@@ -1133,6 +1649,11 @@ bool FoodPantries::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(1, pMasqueradingVector[1], pJson[pMasqueradingVector[1]], err, true))
                   return false;
           }
+        else
+        {
+            err="The " + pMasqueradingVector[1] + " column cannot be null";
+            return false;
+        }
       }
       if(!pMasqueradingVector[2].empty())
       {
@@ -1141,6 +1662,11 @@ bool FoodPantries::validateMasqueradedJsonForCreation(const Json::Value &pJson,
               if(!validJsonOfField(2, pMasqueradingVector[2], pJson[pMasqueradingVector[2]], err, true))
                   return false;
           }
+        else
+        {
+            err="The " + pMasqueradingVector[2] + " column cannot be null";
+            return false;
+        }
       }
       if(!pMasqueradingVector[3].empty())
       {
@@ -1179,6 +1705,38 @@ bool FoodPantries::validateMasqueradedJsonForCreation(const Json::Value &pJson,
           if(pJson.isMember(pMasqueradingVector[7]))
           {
               if(!validJsonOfField(7, pMasqueradingVector[7], pJson[pMasqueradingVector[7]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[8].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[8]))
+          {
+              if(!validJsonOfField(8, pMasqueradingVector[8], pJson[pMasqueradingVector[8]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[9].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[9]))
+          {
+              if(!validJsonOfField(9, pMasqueradingVector[9], pJson[pMasqueradingVector[9]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[10].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[10]))
+          {
+              if(!validJsonOfField(10, pMasqueradingVector[10], pJson[pMasqueradingVector[10]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[11].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[11]))
+          {
+              if(!validJsonOfField(11, pMasqueradingVector[11], pJson[pMasqueradingVector[11]], err, true))
                   return false;
           }
       }
@@ -1237,13 +1795,33 @@ bool FoodPantries::validateJsonForUpdate(const Json::Value &pJson, std::string &
         if(!validJsonOfField(7, "longitude", pJson["longitude"], err, false))
             return false;
     }
+    if(pJson.isMember("meal_type"))
+    {
+        if(!validJsonOfField(8, "meal_type", pJson["meal_type"], err, false))
+            return false;
+    }
+    if(pJson.isMember("frequency"))
+    {
+        if(!validJsonOfField(9, "frequency", pJson["frequency"], err, false))
+            return false;
+    }
+    if(pJson.isMember("phone"))
+    {
+        if(!validJsonOfField(10, "phone", pJson["phone"], err, false))
+            return false;
+    }
+    if(pJson.isMember("program"))
+    {
+        if(!validJsonOfField(11, "program", pJson["program"], err, false))
+            return false;
+    }
     return true;
 }
 bool FoodPantries::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                                     const std::vector<std::string> &pMasqueradingVector,
                                                     std::string &err)
 {
-    if(pMasqueradingVector.size() != 8)
+    if(pMasqueradingVector.size() != 12)
     {
         err = "Bad masquerading vector";
         return false;
@@ -1294,6 +1872,26 @@ bool FoodPantries::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
           if(!validJsonOfField(7, pMasqueradingVector[7], pJson[pMasqueradingVector[7]], err, false))
               return false;
       }
+      if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+      {
+          if(!validJsonOfField(8, pMasqueradingVector[8], pJson[pMasqueradingVector[8]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[9].empty() && pJson.isMember(pMasqueradingVector[9]))
+      {
+          if(!validJsonOfField(9, pMasqueradingVector[9], pJson[pMasqueradingVector[9]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[10].empty() && pJson.isMember(pMasqueradingVector[10]))
+      {
+          if(!validJsonOfField(10, pMasqueradingVector[10], pJson[pMasqueradingVector[10]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[11].empty() && pJson.isMember(pMasqueradingVector[11]))
+      {
+          if(!validJsonOfField(11, pMasqueradingVector[11], pJson[pMasqueradingVector[11]], err, false))
+              return false;
+      }
     }
     catch(const Json::LogicError &e)
     {
@@ -1330,7 +1928,8 @@ bool FoodPantries::validJsonOfField(size_t index,
         case 1:
             if(pJson.isNull())
             {
-                return true;
+                err="The " + fieldName + " column cannot be null";
+                return false;
             }
             if(!pJson.isString())
             {
@@ -1341,7 +1940,8 @@ bool FoodPantries::validJsonOfField(size_t index,
         case 2:
             if(pJson.isNull())
             {
-                return true;
+                err="The " + fieldName + " column cannot be null";
+                return false;
             }
             if(!pJson.isString())
             {
@@ -1399,6 +1999,50 @@ bool FoodPantries::validJsonOfField(size_t index,
                 return true;
             }
             if(!pJson.isNumeric())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 8:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 9:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 10:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 11:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
                 return false;

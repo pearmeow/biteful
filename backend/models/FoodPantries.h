@@ -52,6 +52,10 @@ class FoodPantries
         static const std::string _address;
         static const std::string _latitude;
         static const std::string _longitude;
+        static const std::string _meal_type;
+        static const std::string _frequency;
+        static const std::string _phone;
+        static const std::string _program;
     };
 
     static const int primaryKeyNumber;
@@ -119,7 +123,6 @@ class FoodPantries
     ///Set the value of the column agency
     void setAgency(const std::string &pAgency) noexcept;
     void setAgency(std::string &&pAgency) noexcept;
-    void setAgencyToNull() noexcept;
 
     /**  For column day_of_week  */
     ///Get the value of the column day_of_week, returns the default value if the column is null
@@ -129,7 +132,6 @@ class FoodPantries
     ///Set the value of the column day_of_week
     void setDayOfWeek(const std::string &pDayOfWeek) noexcept;
     void setDayOfWeek(std::string &&pDayOfWeek) noexcept;
-    void setDayOfWeekToNull() noexcept;
 
     /**  For column open_time  */
     ///Get the value of the column open_time, returns the default value if the column is null
@@ -179,8 +181,48 @@ class FoodPantries
     void setLongitude(const double &pLongitude) noexcept;
     void setLongitudeToNull() noexcept;
 
+    /**  For column meal_type  */
+    ///Get the value of the column meal_type, returns the default value if the column is null
+    const std::string &getValueOfMealType() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getMealType() const noexcept;
+    ///Set the value of the column meal_type
+    void setMealType(const std::string &pMealType) noexcept;
+    void setMealType(std::string &&pMealType) noexcept;
+    void setMealTypeToNull() noexcept;
 
-    static size_t getColumnNumber() noexcept {  return 8;  }
+    /**  For column frequency  */
+    ///Get the value of the column frequency, returns the default value if the column is null
+    const std::string &getValueOfFrequency() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getFrequency() const noexcept;
+    ///Set the value of the column frequency
+    void setFrequency(const std::string &pFrequency) noexcept;
+    void setFrequency(std::string &&pFrequency) noexcept;
+    void setFrequencyToNull() noexcept;
+
+    /**  For column phone  */
+    ///Get the value of the column phone, returns the default value if the column is null
+    const std::string &getValueOfPhone() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getPhone() const noexcept;
+    ///Set the value of the column phone
+    void setPhone(const std::string &pPhone) noexcept;
+    void setPhone(std::string &&pPhone) noexcept;
+    void setPhoneToNull() noexcept;
+
+    /**  For column program  */
+    ///Get the value of the column program, returns the default value if the column is null
+    const std::string &getValueOfProgram() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getProgram() const noexcept;
+    ///Set the value of the column program
+    void setProgram(const std::string &pProgram) noexcept;
+    void setProgram(std::string &&pProgram) noexcept;
+    void setProgramToNull() noexcept;
+
+
+    static size_t getColumnNumber() noexcept {  return 12;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -210,6 +252,10 @@ class FoodPantries
     std::shared_ptr<std::string> address_;
     std::shared_ptr<double> latitude_;
     std::shared_ptr<double> longitude_;
+    std::shared_ptr<std::string> mealType_;
+    std::shared_ptr<std::string> frequency_;
+    std::shared_ptr<std::string> phone_;
+    std::shared_ptr<std::string> program_;
     struct MetaData
     {
         const std::string colName_;
@@ -221,7 +267,7 @@ class FoodPantries
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[8]={ false };
+    bool dirtyFlag_[12]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -276,6 +322,26 @@ class FoodPantries
             sql += "longitude,";
             ++parametersCount;
         }
+        if(dirtyFlag_[8])
+        {
+            sql += "meal_type,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[9])
+        {
+            sql += "frequency,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[10])
+        {
+            sql += "phone,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[11])
+        {
+            sql += "program,";
+            ++parametersCount;
+        }
         needSelection=true;
         if(parametersCount > 0)
         {
@@ -320,6 +386,26 @@ class FoodPantries
             sql.append(placeholderStr, n);
         }
         if(dirtyFlag_[7])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[8])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[9])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[10])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[11])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
