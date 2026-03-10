@@ -1,16 +1,17 @@
 #include <drogon/drogon.h>
 #include <json/value.h>
-#include "filters/CorsFilter.h"
+
 #include <cstdlib>
 #include <fstream>
-#include <sstream>
 #include <string>
 
+#include "./filters/CorsFilter.h"
+
 /**
- * Simple helper to load KEY=VALUE pairs from a .env file 
+ * Simple helper to load KEY=VALUE pairs from a .env file
  * into the process environment.
  */
-void loadEnv(const std::string &path) {
+void loadEnv(const std::string& path) {
     std::ifstream envFile(path);
     if (!envFile.is_open()) {
         LOG_WARN << "No .env file found at " << path << ". Relying on system environment.";
@@ -21,7 +22,7 @@ void loadEnv(const std::string &path) {
     while (std::getline(envFile, line)) {
         // Remove carriage return for Windows compatibility
         if (!line.empty() && line.back() == '\r') line.pop_back();
-        
+
         // Skip empty lines or comments
         if (line.empty() || line[0] == '#') continue;
 
@@ -29,7 +30,7 @@ void loadEnv(const std::string &path) {
         if (delimiterPos != std::string::npos) {
             std::string key = line.substr(0, delimiterPos);
             std::string value = line.substr(delimiterPos + 1);
-            
+
             // Remove optional quotes from value
             if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
                 value = value.substr(1, value.size() - 2);
@@ -50,7 +51,7 @@ int main() {
 
     Json::Value config;
     std::ifstream jsonFileStream("../config.json", std::ifstream::binary);
-    
+
     if (!jsonFileStream.is_open()) {
         LOG_ERROR << "Could not open config.json!";
         return 1;
@@ -83,13 +84,14 @@ int main() {
     }
 
     drogon::app().loadConfigJson(config);
-    
-    drogon::app().registerPostHandlingAdvice([](const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp) {
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        resp->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-        resp->addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-    });
+
+    drogon::app().registerPostHandlingAdvice(
+        [](const drogon::HttpRequestPtr& req, const drogon::HttpResponsePtr& resp) {
+            resp->addHeader("Access-Control-Allow-Origin", "*");
+            resp->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+            resp->addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        });
     drogon::app().run();
-    
+
     return 0;
 }
