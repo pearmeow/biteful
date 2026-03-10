@@ -1,16 +1,17 @@
 #include "AuthRest.h"
-#include <string>
-#include "plugins/SodiumPlugin.h"
+
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpTypes.h>
 #include <drogon/orm/DbClient.h>
+#include <drogon/orm/Exception.h>
 #include <drogon/orm/Result.h>
-#include <drogon/orm/Exception.h> 
+
+#include <string>
+
+#include "../plugins/SodiumPlugin.h"
 
 // POST /auth/login
-void AuthRest::login(const HttpRequestPtr &req,
-                     std::function<void(const HttpResponsePtr &)> &&callback)
-{
+void AuthRest::login(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     auto json = req->getJsonObject();
     if (!json) {
         auto resp = drogon::HttpResponse::newHttpResponse();
@@ -25,14 +26,14 @@ void AuthRest::login(const HttpRequestPtr &req,
     auto dbClient = drogon::app().getDbClient();
     dbClient->execSqlAsync(
         "SELECT id, password_hash FROM Users WHERE email = $1",
-        [callback, password](const drogon::orm::Result &res) {
+        [callback, password](const drogon::orm::Result& res) {
             if (res.size() > 0) {
-                auto *sodium = drogon::app().getPlugin<SodiumPlugin>();
+                auto* sodium = drogon::app().getPlugin<SodiumPlugin>();
                 std::string storedHash = res[0]["password_hash"].as<std::string>();
 
                 if (sodium->verifyPassword(password, storedHash)) {
                     Json::Value ret;
-                    ret["token"] = "jwt_token_example"; 
+                    ret["token"] = "jwt_token_example";
                     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
                     callback(resp);
                     return;
@@ -43,7 +44,7 @@ void AuthRest::login(const HttpRequestPtr &req,
             resp->setStatusCode(drogon::k401Unauthorized);
             callback(resp);
         },
-        [callback](const drogon::orm::DrogonDbException &e) {
+        [callback](const drogon::orm::DrogonDbException& e) {
             auto resp = drogon::HttpResponse::newHttpResponse();
             resp->setStatusCode(drogon::k500InternalServerError);
             callback(resp);
@@ -52,9 +53,7 @@ void AuthRest::login(const HttpRequestPtr &req,
 }
 
 // POST /auth/logout
-void AuthRest::logout(const HttpRequestPtr &req,
-                      std::function<void(const HttpResponsePtr &)> &&callback)
-{
+void AuthRest::logout(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     Json::Value ret;
     ret["result"] = "logged_out";
     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);

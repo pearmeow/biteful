@@ -1,38 +1,34 @@
 #pragma once
 
 #include <drogon/HttpController.h>
-#include <string>
+
 #include <functional>
+#include <string>
 
-using namespace drogon; 
+using namespace drogon;
 
-class UserRest : public drogon::HttpController<UserRest>
-{
-  public:
+class UserRest : public drogon::HttpController<UserRest> {
+public:
     // Define the routes manually to avoid Restful template bugs
     METHOD_LIST_BEGIN
-        // POST /users (Sign-up)
-        ADD_METHOD_TO(UserRest::create, "/users", Post, "CorsFilter");
-        // GET /users/{id}
-        ADD_METHOD_TO(UserRest::getOne, "/users/{1}", Get, "CorsFilter");
-        // PUT /users/{id}
-        ADD_METHOD_TO(UserRest::updateOne, "/users/{1}", Put, "CorsFilter");
-        // DELETE /users/{id}
-        ADD_METHOD_TO(UserRest::deleteOne, "/users/{1}", Delete, "CorsFilter");
+    // POST /users (Sign-up)
+    ADD_METHOD_TO(UserRest::create, "/users", Post, "CorsFilter");
+    // GET /users/{id}
+    ADD_METHOD_TO(UserRest::getOne, "/users/{1}", Get, "CorsFilter");
+    // PUT /users/{id}
+    ADD_METHOD_TO(UserRest::updateOne, "/users/{1}", Put, "CorsFilter");
+    // DELETE /users/{id}
+    ADD_METHOD_TO(UserRest::deleteOne, "/users/{1}", Delete, "CorsFilter");
     METHOD_LIST_END
 
-    void create(const drogon::HttpRequestPtr &req,
-                std::function<void(const drogon::HttpResponsePtr &)> &&callback);
+    void create(const drogon::HttpRequestPtr& req, std::function<void(const drogon::HttpResponsePtr&)>&& callback);
 
-    void getOne(const drogon::HttpRequestPtr &req,
-                std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-                std::string &&id);
+    void getOne(const drogon::HttpRequestPtr& req, std::function<void(const drogon::HttpResponsePtr&)>&& callback,
+                std::string&& id);
 
-    void updateOne(const drogon::HttpRequestPtr &req,
-                   std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-                   std::string &&id);
+    void updateOne(const drogon::HttpRequestPtr& req,
+                   std::function<void(const drogon::HttpResponsePtr&)>&& callback, std::string&& id);
 
-    void deleteOne(const drogon::HttpRequestPtr &req,
-                   std::function<void(const drogon::HttpResponsePtr &)> &&callback,
-                   std::string &&id);
+    void deleteOne(const drogon::HttpRequestPtr& req,
+                   std::function<void(const drogon::HttpResponsePtr&)>&& callback, std::string&& id);
 };
