@@ -1,5 +1,3 @@
-#include "AuthRest.h"
-
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpTypes.h>
 #include <drogon/orm/DbClient.h>
@@ -9,9 +7,10 @@
 #include <string>
 
 #include "../plugins/SodiumPlugin.h"
+#include "Auth.h"
 
 // POST /auth/login
-void AuthRest::login(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+void Auth::login(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     auto json = req->getJsonObject();
     if (!json) {
         auto resp = drogon::HttpResponse::newHttpResponse();
@@ -53,7 +52,7 @@ void AuthRest::login(const HttpRequestPtr& req, std::function<void(const HttpRes
 }
 
 // POST /auth/logout
-void AuthRest::logout(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+void Auth::logout(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     Json::Value ret;
     ret["result"] = "logged_out";
     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);

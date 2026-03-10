@@ -1,4 +1,4 @@
-#include "UserRest.h"
+#include "User.h"
 
 #include <drogon/orm/DbClient.h>
 
@@ -7,7 +7,7 @@
 using namespace drogon;
 
 // POST /users
-void UserRest::create(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+void User::create(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     auto json = req->getJsonObject();
     if (!json) {
         auto resp = HttpResponse::newHttpResponse();
@@ -50,8 +50,8 @@ void UserRest::create(const HttpRequestPtr& req, std::function<void(const HttpRe
 }
 
 // GET /users/{id}
-void UserRest::getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                      std::string&& id) {
+void User::getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+                  std::string&& id) {
     auto dbClient = app().getDbClient();
     dbClient->execSqlAsync(
         "SELECT id, username, email FROM Users WHERE id = $1",
@@ -78,15 +78,15 @@ void UserRest::getOne(const HttpRequestPtr& req, std::function<void(const HttpRe
         id);
 }
 
-void UserRest::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                         std::string&& id) {
+void User::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+                     std::string&& id) {
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k501NotImplemented);
     callback(resp);
 }
 
-void UserRest::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                         std::string&& id) {
+void User::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+                     std::string&& id) {
     auto dbClient = app().getDbClient();
     dbClient->execSqlAsync(
         "DELETE FROM Users WHERE id = $1",
