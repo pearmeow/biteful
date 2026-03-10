@@ -1,0 +1,13 @@
+---
+# Style based on google but with 4 space indents
+BasedOnStyle: Google
+IndentWidth: 4
+---
+Language: Cpp
+DerivePointerAlignment: False
+PointerAlignment: Left
+ColumnLimit: 115
+AllowShortFunctionsOnASingleLine: None
+IndentAccessModifiers: False
+AccessModifierOffset: -4
+---
