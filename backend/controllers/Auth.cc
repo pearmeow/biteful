@@ -19,12 +19,12 @@ void Auth::login(const HttpRequestPtr& req, std::function<void(const HttpRespons
         return;
     }
 
-    std::string email = json->get("email", "").asString();
+    std::string email = json->get("username", "").asString();
     std::string password = json->get("password", "").asString();
 
     auto dbClient = drogon::app().getDbClient();
     dbClient->execSqlAsync(
-        "SELECT id, password_hash FROM Users WHERE email = $1",
+        "SELECT id, password_hash FROM Users WHERE username = $1",
         [callback, password](const drogon::orm::Result& res) {
             if (res.size() > 0) {
                 auto* sodium = drogon::app().getPlugin<SodiumPlugin>();
