@@ -56,8 +56,8 @@ int main() {
                 // TODO: change this allow origin to a environment variable of where the frontend is
                 res->addHeader("Access-Control-Allow-Origin", "http://localhost:5173");
                 res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-                // unneeded authorization header for JWTS
-                // res->addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                // don't need authorization in here
+                res->addHeader("Access-Control-Allow-Headers", "Content-Type");
                 res->addHeader("Access-Control-Allow-Credentials", "true");
                 res->setStatusCode(drogon::k200OK);
                 acb(res);  // Short-circuit: send response now
@@ -72,8 +72,8 @@ int main() {
             // TODO: change this allow origin to a environment variable of where the frontend is
             res->addHeader("Access-Control-Allow-Origin", "http://localhost:5173");
             res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-            // unneeded authorization header for JWTS
-            // res->addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            // don't need authorization in here
+            res->addHeader("Access-Control-Allow-Headers", "Content-Type");
             res->addHeader("Access-Control-Allow-Credentials", "true");
         });
 

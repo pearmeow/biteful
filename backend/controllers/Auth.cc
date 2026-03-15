@@ -38,6 +38,7 @@ void Auth::login(const HttpRequestPtr& req, std::function<void(const HttpRespons
                     ret["id"] = id;
                     auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
                     req->session()->insert("loggedIn", true);
+                    resp->addCookie("JSESSIONID", req->session()->sessionId());
                     callback(resp);
                     return;
                 }
