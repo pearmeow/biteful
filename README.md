@@ -30,6 +30,14 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     npm install
     ```
 
+    Create an `.env` file located in `~/biteful/frontend` and it should look
+    like the following. The following path is for local development, it may
+    differ for deployment.
+
+    ```bash
+    VITE_API_BASE_URL="http://localhost:5555/"
+    ```
+
 4. Install Postgres
 
     A Postgres database is used in the backend.
@@ -54,7 +62,7 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     ALTER ROLE user CREATEDB;
     ```
 
-    Your `.env` file should be located in `~/biteful/backend` and look something
+    Create another `.env` file located in `~/biteful/backend` and it should look
     like the following. Make sure the user and password match what you set above.
 
     ```bash
@@ -63,7 +71,7 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     DB_PASSWORD=password
     ```
 
-5. Install Backend Dependencies (C++, Drogon)
+5. Install Backend Dependencies (C++, Drogon, Libsodium)
 
     A C++17 (or higher) compiler and `cmake` is required.
 
@@ -75,7 +83,8 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
 
     ```bash
     sudo apt install libjsoncpp-dev uuid-dev \
-    zlib1g-dev libssl-dev libyaml-cpp-dev 
+    zlib1g-dev libssl-dev libyaml-cpp-dev \
+    libsodium-dev
     ```
 
     Install the drogon framework so that `drogon_ctl` can be used.
