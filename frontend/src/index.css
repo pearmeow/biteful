@@ -1,7 +1,90 @@
-.layout-container { display: flex; flex-direction: column; min-height: 100vh; }
-.navbar { display: flex; justify-content: space-between; padding: 1rem; background: #2c3e50; color: white; }
-.nav-links a, .nav-links button { color: white; margin-left: 15px; text-decoration: none; cursor: pointer; }
-.content-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
-.auth-card { border: 1px solid #ddd; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
-input { width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-button { width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 4px; }
+/* Layout Shell */
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar Structure */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Crucial for vertical alignment */
+    padding: 1rem 2rem;
+    background: #2c3e50;
+    color: white;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Use gap instead of margins for cleaner spacing */
+}
+
+/* Links and Buttons inside Nav */
+.nav-links a, 
+.nav-links .logout-btn {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.nav-links a:hover, 
+.nav-links .logout-btn:hover {
+    opacity: 0.8;
+}
+
+/* Specific Reset for Logout Button */
+.logout-btn {
+    background: none !important; /* Force override of general button style */
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;     /* Prevents the 100% width from general button */
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Auth Cards & Inputs */
+.auth-card {
+    border: 1px solid #ddd;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+/* Global Action Buttons (Login/Signup) */
+button:not(.logout-btn) { 
+    width: 100%; 
+    padding: 10px; 
+    background: #3498db; 
+    color: white; 
+    border: none; 
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:not(.logout-btn):hover {
+    background: #2980b9;
+}
