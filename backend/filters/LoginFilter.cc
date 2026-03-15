@@ -12,15 +12,14 @@
 using namespace drogon;
 
 void LoginFilter::doFilter(const HttpRequestPtr& req, FilterCallback&& fcb, FilterChainCallback&& fccb) {
-    auto token = req->getHeader("Authorization");
-    // Edit your logic here
-    if (!token.empty()) {
-        // Passed
-        fccb();
+    // check if session has a logged in variable and if that variable is true
+    if (req->session()->find("loggedIn") && req->session()->get<std::string>("loggedIn") != "true") {
+        auto resp = drogon::HttpResponse::newHttpResponse();
+        resp->setStatusCode(drogon::k400BadRequest);
+        fcb(resp);
         return;
     }
-    // Check failed
-    auto resp = drogon::HttpResponse::newHttpResponse();
-    resp->setStatusCode(drogon::k401Unauthorized);
-    fcb(resp);
+    // go to the next one filter/route
+    fccb();
+    return;
 }
