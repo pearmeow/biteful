@@ -5,8 +5,7 @@ import SignupForm from "./features/users/components/SignupForm";
 import Dashboard from "./features/users/components/Dashboard";
 
 function App() {
-    // Check if token exists in localStorage (syncs with Drogon Auth)
-    const isAuthenticated = !!localStorage.getItem("token");
+    // check if cookie exists
 
     return (
         <BrowserRouter>
@@ -17,26 +16,10 @@ function App() {
                     <Route path="/signup" element={<SignupForm />} />
 
                     {/* Protected Route */}
-                    <Route
-                        path="/dashboard"
-                        element={
-                            isAuthenticated ? (
-                                <Dashboard />
-                            ) : (
-                                <Navigate to="/login" />
-                            )
-                        }
-                    />
+                    <Route path="/dashboard" element={<Dashboard />} />
 
                     {/* Default Route */}
-                    <Route
-                        path="/"
-                        element={
-                            <Navigate
-                                to={isAuthenticated ? "/dashboard" : "/login"}
-                            />
-                        }
-                    />
+                    <Route path="/" element={<Navigate to={"/login"} />} />
                 </Route>
             </Routes>
         </BrowserRouter>

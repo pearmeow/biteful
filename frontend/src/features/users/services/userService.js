@@ -13,7 +13,7 @@ export const userService = {
         });
     },
 
-    // Gets profile info (username, email) for the logged-in user
+    // pretty sure this path is wrong...
     getProfile: async () => {
         return await drogonClient("user/profile", {
             method: "GET",
