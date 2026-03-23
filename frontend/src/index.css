@@ -1,68 +1,90 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Layout Shell */
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* Navbar Structure */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Crucial for vertical alignment */
+    padding: 1rem 2rem;
+    background: #2c3e50;
+    color: white;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Use gap instead of margins for cleaner spacing */
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Links and Buttons inside Nav */
+.nav-links a, 
+.nav-links .logout-btn {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.nav-links a:hover, 
+.nav-links .logout-btn:hover {
+    opacity: 0.8;
+}
+
+/* Specific Reset for Logout Button */
+.logout-btn {
+    background: none !important; /* Force override of general button style */
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;     /* Prevents the 100% width from general button */
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Auth Cards & Inputs */
+.auth-card {
+    border: 1px solid #ddd;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+/* Global Action Buttons (Login/Signup) */
+button:not(.logout-btn) { 
+    width: 100%; 
+    padding: 10px; 
+    background: #3498db; 
+    color: white; 
+    border: none; 
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:not(.logout-btn):hover {
+    background: #2980b9;
 }
