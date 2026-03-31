@@ -123,3 +123,19 @@ button:not(.logout-btn) {
 button:not(.logout-btn):hover {
     background: #2980b9;
 }
+
+/* icon for login/signup */
+.brand-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* footer */
+.footer {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 0.9rem;
+}

@@ -24,15 +24,13 @@ const MainLayout = ({ children }) => {
     const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
     return (
         <div className="layout-container">
-            {/* show navbar if NOT on login/signup */}
             {!isAuthPage && <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
 
             <main className="content-area">
                 {isAuthPage ? (
-                    /* split screen design for login/signup only */
                     <>
                         <div className="brand-side">
-                            <div style={{ fontSize: '4rem' }}>🍴</div> 
+                            <div className="brand-icon">🍴</div> 
                             <h1>Biteful</h1>
                         </div>
                         <div className="form-side">
@@ -40,14 +38,12 @@ const MainLayout = ({ children }) => {
                         </div>
                     </>
                 ) : (
-                    /* normal layout */
                     <div className="standard-view">
                         {children}
                     </div>
                 )}
             </main>
 
-            {/*  show footer if NOT on login/signup */}
             {!isAuthPage && (
                 <footer className="footer">
                     <p>© 2026 Modular React + Drogon C++</p>
