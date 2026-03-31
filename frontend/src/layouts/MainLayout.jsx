@@ -3,6 +3,8 @@ import auth from "../features/auth/services/auth";
 import Navbar from "../components/layout/Navbar";
 import { useState } from "react";
 import logoImg from "../assets/biteful_logo.png";
+import "../index.css";
+import "../Auth.css";
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();

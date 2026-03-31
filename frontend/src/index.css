@@ -2,11 +2,10 @@ body {
     margin: 0;
     font-family: sans-serif; 
     color: #333;
+    background-color: #f4f7f6; /* Clean background for dashboard */
 }
 
-button, input {
-    font-family: inherit;
-}
+button, input { font-family: inherit; }
 
 .layout-container {
     display: flex;
@@ -19,129 +18,29 @@ button, input {
     display: flex;
 }
 
-/* left side (logo) */
-.brand-side {
-    flex: 1;
-    background-color: #7e3ff2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-}
-
-.brand-logo {
-    width: 120px;
-    height: auto;
-    margin-bottom: 1rem;
-}
-
-.brand-side h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 0;
-}
-
-/* right side (form) */
-.form-side {
-    flex: 1;
-    background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* This makes the Dashboard look like a real app page */
+.standard-view {
+    width: 100%;
     padding: 2rem;
-}
-
-.auth-card {
-    width: 100%;
-    max-width: 350px;
-}
-
-.form-header-section {
-    margin-bottom: 2rem;
-}
-
-.auth-header {
-    font-family: sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 1.8rem;
-    color: #4a148c;
-    margin: 0;
-}
-
-.auth-subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin-top: 5px;
-    font-weight: 400;
-}
-
-/* form */
-label {
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #7e3ff2;
-    display: block;
-    margin-bottom: 5px;
-}
-
-input {
-    width: 100%;
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
     box-sizing: border-box;
 }
 
-button:not(.logout-btn) { 
-    width: 100%; 
-    padding: 12px; 
-    background: #7e3ff2; 
-    color: white; 
-    border: none; 
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-button:not(.logout-btn):hover {
-    background: #6928e0;
-}
-
-/* footer */
 .footer {
     padding: 1.5rem;
     text-align: center;
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     border-top: 1px solid #eee;
     color: #666;
     font-size: 0.9rem;
 }
 
-/* "Don't have an account? Create account" text area */
-.auth-switch {
+.navbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 5px;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: #4a148c; /* This is the Dark Purple */
-    font-weight: 500;
-}
-
-/* The clickable link inside that text */
-.auth-switch a {
-    color: #7e3ff2; /* Keeps the link itself vibrant purple */
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.auth-switch a:hover {
-    text-decoration: underline;
+    padding: 0.8rem 2rem;
+    background: #7e3ff2; /* White bar for the dashboard */
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Soft shadow */
+    z-index: 1000;
 }

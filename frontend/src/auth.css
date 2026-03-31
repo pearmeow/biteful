@@ -1,0 +1,50 @@
+.brand-side {
+    flex: 1;
+    background-color: #7e3ff2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.brand-logo { width: 120px; margin-bottom: 1rem; }
+
+.brand-side h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.form-side {
+    flex: 1;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card { width: 100%; max-width: 350px; }
+
+.auth-header {
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    color: #4a148c;
+}
+
+/* Specific styling for auth inputs only */
+.form-side input {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.auth-switch {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    color: #4a148c;
+}
