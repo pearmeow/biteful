@@ -1,10 +1,9 @@
 /* left side (brand side) */
 .brand-side {
     flex: 1;
-    /* Replace 'your-image-path.jpg' with your actual file path */
-    background-image: url('./assets/leftbg.png'); 
-    background-size: cover;      /* Scales image to fill the area */
-    background-position: center;  /* Keeps the focus in the middle */
+    background-image: url('../../../assets/leftbg.png'); 
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     background-color: #7e3ff2; 
     display: flex;
@@ -78,7 +77,7 @@
     font-size: 1.2rem;
 }
 
-/* Text styling inside the boxes */
+/* text styling in boxes  */
 .feature-text strong {
     display: block;
     font-size: 0.85rem;
@@ -88,11 +87,12 @@
 
 .feature-text p {
     font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.9); /* Slightly more opaque for readability */
+    color: rgba(255, 255, 255, 0.9);
     margin: 0;
     line-height: 1.1;
 }
 
+/* right side (where the login/signup form is) */
 .form-side {
     flex: 1;
     background-color: #ffffffca;
@@ -105,13 +105,13 @@
 
 .auth-card { width: 100%; max-width: 350px; }
 
+/* auth button */
 .auth-card button {
     width: 100%;
     padding: 10px;
-    background-color: #7e3ff2; /* Vibrant Purple */
+    background-color: #7e3ff2;
     color: white;
     border: none;
-    /*border-radius: 12px;*/
     font-weight: 700;
     cursor: pointer;
     margin-top: 10px;
@@ -123,11 +123,11 @@
 }
 
 .auth-card button:active {
-    /* The "click" animation */
     transform: translateY(3px);
     box-shadow: 0 2px 0 #4a148c;
 }
 
+/* welcome back ! */
 .auth-header {
     font-weight: 800;
     text-transform: uppercase;
@@ -135,7 +135,7 @@
     color: #4a148c;
 }
 
-/* Specific styling for auth inputs only */
+/* auth input styling */
 .form-side input {
     width: 100%;
     margin-bottom: 15px;
@@ -151,14 +151,13 @@
     color: #4a148c;
 }
 
-/* Individual container for each field */
+/* container for each field */
 .input-group {
     background: white;
-    border: 2px solid #7e3ff2; /* Thick purple border */
-    border-radius: 12px;      /* Rounded corners */
+    border: 2px solid #7e3ff2;
+    border-radius: 12px;
     padding: 12px;
     margin-bottom: 20px;
-    /* This creates the 3D 'bottom' effect */
     box-shadow: 0 5px 0 #4a148c; 
 }
 
@@ -170,18 +169,18 @@
     display: block;
 }
 
-/* The inner border box around the actual input */
+/* inner box in each field for actual input */
 .input-wrapper {
     display: flex;
     align-items: center;
-    border: 2px solid #dcd0ff; /* Light purple inner border */
+    border: 2px solid #dcd0ff;
     border-radius: 10px;
     padding: 8px 12px;
     gap: 10px;
 }
 
 .input-wrapper input {
-    border: none !important; /* Remove the old input borders */
+    border: none !important;
     padding: 0 !important;
     margin: 0 !important;
     outline: none;
@@ -190,7 +189,7 @@
     font-weight: 600;
 }
 
-/* Styling the little icon box if you want it */
+/* icon box */
 .input-icon {
     background: #7e3ff2;
     color: white;

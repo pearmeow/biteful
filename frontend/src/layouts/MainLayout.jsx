@@ -1,10 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import auth from "../features/auth/services/auth";
 import Navbar from "../components/layout/Navbar";
+import BrandSide from "../features/auth/components/BrandSide.jsx";
 import { useState } from "react";
-import logoImg from "../assets/biteful_logo.png";
 import "../index.css";
-import "../Auth.css";
+import "../features/auth/components/auth.css";
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -57,53 +57,14 @@ const MainLayout = ({ children }) => {
             <main className="content-area">
                 {isAuthPage ? (
                     <>
-                        <div className="brand-side">
-                            <img
-                                src={logoImg}
-                                alt="Biteful Logo"
-                                className="brand-logo"
-                            />
-                            <h1>Biteful</h1>
-                            {/* i cant think of a slogan */}
-                            <div className="slogan-badge">
-                                FIND FOOD AND BE HAPPY!
-                            </div>
-                            {/* Feature Boxes */}
-                            <div className="features-container">
-                                <div className="feature-box">
-                                <div className="feature-icon">⚲</div>
-                                <div className="feature-text">
-                                    <strong>Find Food Spots</strong>
-                                    <p>Discover local food pantries and restaurants</p>
-                                </div>
-                                </div>
-
-                                <div className="feature-box">
-                                <div className="feature-icon">𐂐𓇋</div>
-                                <div className="feature-text">
-                                    <strong>Be Healthy</strong>
-                                    <p>Get warned if a restaurant tends to be unhealthy</p>
-                                </div>
-                                </div>
-
-                                <div className="feature-box">
-                                <div className="feature-icon">🕊</div>
-                                <div className="feature-text">
-                                    <strong>Grow and Learn</strong>
-                                    <p>Your pigeon friend changes alongside your decisions</p>
-                                </div>
-                                </div>
-                            </div>
-                        </div>
+                        <BrandSide /> 
                         <div className="form-side">
                             <div className="auth-card">
                                 <div className="form-header-section">
-                                    <h2 className="auth-header">
-                                        {headerText}
-                                    </h2>
+                                    <h2 className="auth-header">{headerText}</h2>
                                     <p className="auth-subtitle">{subText}</p>
                                 </div>
-                                {children}
+                                {children} 
                             </div>
                         </div>
                     </>

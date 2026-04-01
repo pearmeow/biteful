@@ -2,7 +2,7 @@ body {
     margin: 0;
     font-family: sans-serif; 
     color: #333;
-    background-color: #f4f7f6; /* Clean background for dashboard */
+    background-color: #f4f7f6;
 }
 
 button, input { font-family: inherit; }
@@ -18,7 +18,6 @@ button, input { font-family: inherit; }
     display: flex;
 }
 
-/* This makes the Dashboard look like a real app page */
 .standard-view {
     width: 100%;
     padding: 2rem;
@@ -34,12 +33,13 @@ button, input { font-family: inherit; }
     font-size: 0.9rem;
 }
 
+/* navbar will be present in every screen besides auth (??) */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.8rem 2rem;
-    background: #7e3ff2; /* White bar for the dashboard */
+    background: #7e3ff2;
     color: #333;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Soft shadow */
     z-index: 1000;
