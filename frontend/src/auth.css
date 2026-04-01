@@ -1,3 +1,4 @@
+/* left side (brand side) */
 .brand-side {
     flex: 1;
     /* Replace 'your-image-path.jpg' with your actual file path */
@@ -11,15 +12,85 @@
     justify-content: center;
     align-items: center;
     color: white;
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
-.brand-logo { width: 120px; margin-bottom: 1rem; }
+/* logo */
+.brand-logo { 
+    width: 90px; 
+    margin-bottom: 0.5rem; 
+}
 
 .brand-side h1 {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 800;
     text-transform: uppercase;
+    margin: 0;
+}
+
+/* slogan */
+.slogan-badge {
+    background-color: #7e3ff2;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.7rem;
+    margin: 10px 0 20px 0;
+}
+
+/* features (the stuff under slogan) */
+.features-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 280px;
+}
+
+.feature-box {
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(10px);          
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s;
+}
+
+/* :P */
+.feature-box:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* icon in box */
+.feature-icon {
+    background: #7e3ff2c5;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    font-size: 1.2rem;
+}
+
+/* Text styling inside the boxes */
+.feature-text strong {
+    display: block;
+    font-size: 0.85rem;
+    color: white;
+    margin-bottom: 1px;
+}
+
+.feature-text p {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.9); /* Slightly more opaque for readability */
+    margin: 0;
+    line-height: 1.1;
 }
 
 .form-side {
@@ -28,6 +99,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 40px; 
+    padding-right: 40px;
 }
 
 .auth-card { width: 100%; max-width: 350px; }
@@ -129,3 +202,4 @@
     border-radius: 6px;
     font-size: 0.8rem;
 }
+

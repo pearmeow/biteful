@@ -27,7 +27,7 @@ const SignupForm = () => {
         <div className="input-group">
           <label>USERNAME</label>
           <div className="input-wrapper">
-            <span className="input-icon">👤</span>
+            <span className="input-icon">☺︎</span>
             <input 
               type="text" 
               placeholder="Choose a username" 
@@ -40,7 +40,7 @@ const SignupForm = () => {
         <div className="input-group">
           <label>EMAIL ADDRESS</label>
           <div className="input-wrapper">
-            <span className="input-icon">✉️</span>
+            <span className="input-icon">✉</span>
             <input 
               type="email" 
               placeholder="your@email.com" 
@@ -53,7 +53,7 @@ const SignupForm = () => {
         <div className="input-group">
           <label>PASSWORD</label>
           <div className="input-wrapper">
-            <span className="input-icon">🔒</span>
+            <span className="input-icon">🔒︎</span>
             <input 
               type="password" 
               placeholder="••••••••" 

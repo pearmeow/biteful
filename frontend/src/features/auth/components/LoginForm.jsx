@@ -23,7 +23,7 @@ const LoginForm = () => {
                 <div className="input-group">
                     <label>Username</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">👤</span>
+                        <span className="input-icon">☺︎</span>
                         <input
                             type="text"
                             placeholder="Enter username"
@@ -37,7 +37,7 @@ const LoginForm = () => {
                 <div className="input-group">
                     <label>Password</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">🔒</span>
+                        <span className="input-icon">🔒︎</span>
                         <input
                             type="password"
                             placeholder="••••••••"

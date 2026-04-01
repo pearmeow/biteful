@@ -4,7 +4,7 @@ import Navbar from "../components/layout/Navbar";
 import { useState } from "react";
 import logoImg from "../assets/biteful_logo.png";
 import "../index.css";
-import "../auth.css";
+import "../Auth.css";
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -18,8 +18,22 @@ const MainLayout = ({ children }) => {
         setIsAuthenticated(true);
     }
 
-    const handleLogout = async () => {
-        await auth.logout();
+    /* for some reason, when i tried it today it didnt work 
+    and it auto defaulted to the dashboard screen and said
+    i was unauthorized to logout? it was working yesterday so 
+    i was a bit confused as to why but it lowk refused to work so
+    that is why it kinda force logouts regardless lololol? */
+
+    const handleLogout = async () => { 
+        try {
+            // Try to tell the server we are leaving
+            await auth.logout();
+        } catch (err) {
+            // Even if the server rejects us (401), we continue anyway
+            console.warn("Backend logout failed, but clearing local session.");
+        }
+        // ALWAYS clear this, regardless of what the backend says
+        localStorage.removeItem("sessionId"); 
         setIsAuthenticated(false);
         navigate("/login");
     };
@@ -50,6 +64,36 @@ const MainLayout = ({ children }) => {
                                 className="brand-logo"
                             />
                             <h1>Biteful</h1>
+                            {/* i cant think of a slogan */}
+                            <div className="slogan-badge">
+                                FIND FOOD AND BE HAPPY!
+                            </div>
+                            {/* Feature Boxes */}
+                            <div className="features-container">
+                                <div className="feature-box">
+                                <div className="feature-icon">⚲</div>
+                                <div className="feature-text">
+                                    <strong>Find Food Spots</strong>
+                                    <p>Discover local food pantries and restaurants</p>
+                                </div>
+                                </div>
+
+                                <div className="feature-box">
+                                <div className="feature-icon">𐂐𓇋</div>
+                                <div className="feature-text">
+                                    <strong>Be Healthy</strong>
+                                    <p>Get warned if a restaurant tends to be unhealthy</p>
+                                </div>
+                                </div>
+
+                                <div className="feature-box">
+                                <div className="feature-icon">🕊</div>
+                                <div className="feature-text">
+                                    <strong>Grow and Learn</strong>
+                                    <p>Your pigeon friend changes alongside your decisions</p>
+                                </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="form-side">
                             <div className="auth-card">
