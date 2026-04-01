@@ -54,7 +54,7 @@ const MainLayout = ({ children }) => {
                 />
             )}
 
-            <main className="content-area">
+            <main className="content-area">  {/* auth pages */}
                 {isAuthPage ? (
                     <>
                         <BrandSide /> 
@@ -73,7 +73,7 @@ const MainLayout = ({ children }) => {
                 )}
             </main>
 
-            {!isAuthPage && (
+            {!isAuthPage && ( 
                 <footer className="footer">
                     <p>© 2026 Modular React + Drogon C++</p>
                 </footer>

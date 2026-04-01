@@ -22,12 +22,12 @@ const SignupForm = () => {
 
   return (
     <div className="auth-card">
-      <h2>Create Account</h2>
+      <h2>Create Account</h2> 
       <form onSubmit={handleSignup}>
-        <div className="input-group">
+        <div className="input-group"> {/* each input field */}
           <label>USERNAME</label>
           <div className="input-wrapper">
-            <span className="input-icon">☺︎</span>
+            <span className="input-icon">☺︎</span> {/* username input */}
             <input 
               type="text" 
               placeholder="Choose a username" 
@@ -37,8 +37,8 @@ const SignupForm = () => {
           </div>
         </div>
         
-        <div className="input-group">
-          <label>EMAIL ADDRESS</label>
+        <div className="input-group"> {/* email input */}
+          <label>EMAIL ADDRESS</label> 
           <div className="input-wrapper">
             <span className="input-icon">✉</span>
             <input 
@@ -50,7 +50,7 @@ const SignupForm = () => {
           </div>
         </div>
 
-        <div className="input-group">
+        <div className="input-group">  {/* password input */}
           <label>PASSWORD</label>
           <div className="input-wrapper">
             <span className="input-icon">🔒︎</span>
@@ -68,7 +68,7 @@ const SignupForm = () => {
           {status.loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
-      <div className="auth-switch">
+      <div className="auth-switch">  {/* link to login */}
         <span>Already have an account? </span>
         <Link to="/login">Login</Link>
       </div>

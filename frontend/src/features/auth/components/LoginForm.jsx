@@ -19,11 +19,11 @@ const LoginForm = () => {
     return (
         <div className="auth-card">
             <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="input-group">
+            <form onSubmit={handleSubmit}> {/* each input field */}
+                <div className="input-group"> 
                     <label>Username</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">☺︎</span>
+                        <span className="input-icon">☺︎</span> {/* username input */}
                         <input
                             type="text"
                             placeholder="Enter username"
@@ -37,7 +37,7 @@ const LoginForm = () => {
                 <div className="input-group">
                     <label>Password</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">🔒︎</span>
+                        <span className="input-icon">🔒︎</span> {/* password input */}
                         <input
                             type="password"
                             placeholder="••••••••"
