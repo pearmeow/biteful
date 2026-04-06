@@ -2,21 +2,22 @@ import { useNavigate, useLocation } from "react-router-dom";
 import auth from "../features/auth/services/auth";
 import Navbar from "../components/layout/Navbar";
 import BrandSide from "../features/auth/components/BrandSide.jsx";
-import { useState } from "react";
+import AuthFormSide from "../features/auth/components/AuthFormSide.jsx";
+import { useState, useEffect } from "react";
 import "../index.css";
 import "../features/auth/components/auth.css";
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation(); // to know which page we r on
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return localStorage.getItem("sessionId") !== null;
+    });
 
-    if (
-        localStorage.getItem("sessionId") !== null &&
-        isAuthenticated == false
-    ) {
-        setIsAuthenticated(true);
-    }
+    useEffect(() => {
+        const session = localStorage.getItem("sessionId");
+        setIsAuthenticated(session !== null);
+    }, [location.pathname]);
 
     /* for some reason, when i tried it today it didnt work 
     and it auto defaulted to the dashboard screen and said
@@ -38,13 +39,7 @@ const MainLayout = ({ children }) => {
         navigate("/login");
     };
 
-    const isAuthPage =
-        location.pathname === "/login" || location.pathname === "/signup";
-    const isLogin = location.pathname === "/login";
-    const headerText = isLogin ? "WELCOME BACK!" : "JOIN BITEFUL!";
-    const subText = isLogin
-        ? "Ready to continue your journey?"
-        : "Start your adventure with us today!";
+    const isAuthPage = ["/login", "/signup"].includes(location.pathname);
     return (
         <div className="layout-container">
             {!isAuthPage && (
@@ -54,19 +49,13 @@ const MainLayout = ({ children }) => {
                 />
             )}
 
-            <main className="content-area">  {/* auth pages */}
+            <main className="content-area">
                 {isAuthPage ? (
                     <>
                         <BrandSide /> 
-                        <div className="form-side">
-                            <div className="auth-card">
-                                <div className="form-header-section">
-                                    <h2 className="auth-header">{headerText}</h2>
-                                    <p className="auth-subtitle">{subText}</p>
-                                </div>
-                                {children} 
-                            </div>
-                        </div>
+                        <AuthFormSide pathname={location.pathname}>
+                            {children}
+                        </AuthFormSide>
                     </>
                 ) : (
                     <div className="standard-view">{children}</div>

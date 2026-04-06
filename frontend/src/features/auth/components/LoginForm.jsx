@@ -21,7 +21,7 @@ const LoginForm = () => {
             <h2>Login</h2>
             <form onSubmit={handleSubmit}> {/* each input field */}
                 <div className="input-group"> 
-                    <label>Username</label>
+                    <label>USERNAME</label>
                     <div className="input-wrapper">
                         <span className="input-icon">☺︎</span> {/* username input */}
                         <input
@@ -35,7 +35,7 @@ const LoginForm = () => {
                 </div>
                 
                 <div className="input-group">
-                    <label>Password</label>
+                    <label>PASSWORD</label>
                     <div className="input-wrapper">
                         <span className="input-icon">🔒︎</span> {/* password input */}
                         <input
