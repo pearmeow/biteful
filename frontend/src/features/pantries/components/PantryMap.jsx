@@ -32,7 +32,21 @@ const PantryMap = ({ pantries = [], target }) => {
           <Popup>
             <div className="pantry-popup-container">
               <h3>{group.agency}</h3>
-              <p>{group.address}</p>
+              <a
+                href={`https://maps.google.com/?q=${encodeURIComponent(group.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pantry-address-link"
+                title="Open in Maps"
+              >
+                {group.address}
+              </a>
+              <a
+                href={`tel:${group.phone.replace(/\D/g, '')}`}
+                className="pantry-phone-link"
+              >
+                {group.phone}
+              </a>
               <div className="pantry-list-scroll">
                 {group.programs.map((p, idx) => (
                   <div key={idx} className="pantry-item-row">

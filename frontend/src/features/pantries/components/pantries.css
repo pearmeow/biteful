@@ -78,3 +78,30 @@
     font-weight: bold;
     text-transform: uppercase;
 }
+
+.pantry-address-link {
+    display: block;
+    margin: 5px 0;
+    color: #7f8c8d;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.pantry-address-link:hover {
+    color: #34495e;
+    text-decoration: underline;
+}
+
+.pantry-phone-link {
+    display: inline-block;
+    margin: 5px 0;
+    color: #2980b9;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pantry-phone-link:hover {
+    text-decoration: underline;
+}
