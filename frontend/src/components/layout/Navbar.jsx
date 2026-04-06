@@ -11,9 +11,9 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
                     <>
                         <Link to="/dashboard">Dashboard</Link>
                         <Link to="/map/pantry"> Pantry </Link>
-                        <Link onClick={onLogout} className="logout-btn">
+                        <button onClick={onLogout} className="logout-btn">
                             Logout
-                        </Link>
+                        </button>
                     </>
                 ) : (
                     <>
