@@ -1,5 +1,3 @@
-
-
 const AUTH_CONTENT = {
     "/login": {
         header: "WELCOME BACK!",
