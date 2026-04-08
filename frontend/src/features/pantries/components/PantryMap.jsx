@@ -12,6 +12,15 @@ function MapUpdater({ target }) {
   return null;
 }
 
+const purpleIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 const PantryMap = ({ pantries = [], target }) => {
   return (
     <MapContainer
@@ -28,7 +37,7 @@ const PantryMap = ({ pantries = [], target }) => {
       <MapUpdater target={target} />
 
       {pantries.map((group) => (
-        <Marker key={group.id} position={[group.latitude, group.longitude]}>
+        <Marker key={group.id} position={[group.latitude, group.longitude]} icon={purpleIcon}>
           <Popup>
             <div className="pantry-popup-container">
               <h3>{group.agency}</h3>
