@@ -8,26 +8,77 @@
     flex-direction: column;
     gap: 20px;
     align-self: flex-start;
-    /* Prevents being squished by parent centering */
 }
 
-.search-header {
+.pantry-search-block {
+    background-color: #f8f7ff; 
+    border: 2px solid #8b3dff;
+    border-radius: 16px;
+    padding: 10px 10px;
+    width: 350px; 
+    margin: 10px 0; 
+    box-shadow: 0 5px 0px #6a2cc7; 
+}
+
+.pantry-search-header {
     display: flex;
-    gap: 10px;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    width: 100%;
-    box-sizing: border-box;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-/* We need a specific width override for the search button 
-   because your global CSS makes all buttons 100% width */
-.search-header button {
-    width: auto !important;
-    padding: 0 25px !important;
-    white-space: nowrap;
+.pantry-search-icon {
+    color: #4ade80;
+    font-size: 1rem;
+}
+
+.pantry-search-title {
+    color: #2d0066;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* wjite search bar wrapper */
+.pantry-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #c2b2ff; 
+    border-radius: 12px;
+    padding: 4px;
+}
+
+/* purple square for icon */
+.pantry-search-button-sq {
+    background-color: #8b3dff;
+    color: white;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* Text Input */
+.pantry-zip-input {
+    border: none !important;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 1rem;
+    color: #8b3dff;
+    width: 100%;
+    font-weight: 600;
+    background: transparent;
+}
+
+.pantry-zip-input::placeholder {
+    color: #c2b2ff;
 }
 
 /* The Map MUST have a height or it will be 0px */
@@ -37,7 +88,6 @@
     border-radius: 12px;
     border: 2px solid #ddd;
     overflow: hidden;
-    /* Keeps map corners rounded */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     position: relative;
 }
@@ -55,7 +105,8 @@
 
 .pantry-popup-container h3 {
     margin: 0 0 5px 0;
-    color: #2c3e50;
+    color: #2d0066;
+    font-weight: bold;
 }
 
 .pantry-list-scroll {
@@ -74,7 +125,7 @@
 .pantry-item-row span {
     display: block;
     font-size: 11px;
-    color: #3498db;
+    color: #8b3dff;
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -85,23 +136,13 @@
     color: #7f8c8d;
     font-size: 13px;
     text-decoration: none;
-    transition: color 0.2s;
-}
-
-.pantry-address-link:hover {
-    color: #34495e;
-    text-decoration: underline;
 }
 
 .pantry-phone-link {
     display: inline-block;
     margin: 5px 0;
-    color: #2980b9;
+    color: #8b3dff;
     font-size: 13px;
     text-decoration: none;
     font-weight: 600;
-}
-
-.pantry-phone-link:hover {
-    text-decoration: underline;
 }

@@ -24,16 +24,26 @@ const PantryExplorer = () => {
 
     return (
         <div className="pantry-page-container">
-            <div className="search-header">
-                <input 
-                    type="text" 
-                    placeholder="Enter Zip Code (e.g., 10011)" 
-                    value={searchZip}
-                    onChange={(e) => setSearchZip(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <button onClick={handleSearch}>Search</button>
+            <div className="pantry-search-block">
+                <div className="pantry-search-header">
+                    <span className="pantry-search-title">FIND LOCAL FOOD PANTRIES</span>
+                </div>
+                
+                <div className="pantry-input-wrapper">
+                    <div className="pantry-search-button-sq" onClick={handleSearch}>
+                        🔍︎
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder="Input zip code..." 
+                        className="pantry-zip-input"
+                        value={searchZip}
+                        onChange={(e) => setSearchZip(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                </div>
             </div>
+
             <div className="map-frame">
                 {!loading && <PantryMap pantries={groups} target={mapTarget} />}
             </div>
