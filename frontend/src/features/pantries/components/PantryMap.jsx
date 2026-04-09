@@ -22,6 +22,11 @@ const purpleIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+const DAY_ORDER = {
+  "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, 
+  "Friday": 5, "Saturday": 6, "Sunday": 7
+};
+
 const PantryMap = ({ pantries = [], target }) => {
   return (
     <MapContainer
@@ -38,7 +43,6 @@ const PantryMap = ({ pantries = [], target }) => {
       <MapUpdater target={target} />
 
       {pantries.map((group) => {
-        // Step 1: Group programs by their name (Pantry, Soup Kitchen, etc.)
         const groupedPrograms = group.programs.reduce((acc, p) => {
           if (!acc[p.program]) acc[p.program] = [];
           acc[p.program].push(p);
@@ -55,11 +59,9 @@ const PantryMap = ({ pantries = [], target }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="pantry-address-link"
-                  title="Open in Maps"
                 >
                   {group.address}
                 </a>
-                <br />
                 <a
                   href={`tel:${group.phone?.replace(/\D/g, '')}`}
                   className="pantry-phone-link"
@@ -68,17 +70,22 @@ const PantryMap = ({ pantries = [], target }) => {
                 </a>
 
                 <div className="pantry-list-scroll">
-                  {/* Step 2: Map through the groups we just created */}
-                  {Object.entries(groupedPrograms).map(([category, days], idx) => (
-                    <div key={idx} className="pantry-category-group">
-                      <span className="pantry-category-label">{category}</span>
-                      {days.map((d, dIdx) => (
-                        <div key={dIdx} className="pantry-day-row">
-                          <strong>{d.day_of_week}</strong>: {d.open_time} - {d.close_time}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
+                  {Object.entries(groupedPrograms).map(([category, days], idx) => {
+                    const sortedDays = [...days].sort((a, b) => 
+                        (DAY_ORDER[a.day_of_week] || 99) - (DAY_ORDER[b.day_of_week] || 99)
+                    );
+
+                    return (
+                      <div key={idx} className="pantry-category-group">
+                        <span className="pantry-category-label">{category}</span>
+                        {sortedDays.map((d, dIdx) => (
+                          <div key={dIdx} className="pantry-day-row">
+                            <strong>{d.day_of_week}:</strong> {d.open_time} - {d.close_time}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </Popup>

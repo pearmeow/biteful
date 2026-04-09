@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePantries } from '../hooks/usePantries';
 import PantryMap from './PantryMap';
+import './pantries.css';
 
 const PantryExplorer = () => {
     const { groups, loading, error } = usePantries();

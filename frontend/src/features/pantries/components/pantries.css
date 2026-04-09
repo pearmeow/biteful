@@ -1,5 +1,3 @@
-/* --- Pantry Explorer Additions --- */
-/* Overrides the flex centering for the Map page only */
 .pantry-page-container {
     width: 100%;
     max-width: 1200px;
@@ -40,7 +38,6 @@
     text-transform: uppercase;
 }
 
-/* wjite search bar wrapper */
 .pantry-input-wrapper {
     display: flex;
     align-items: center;
@@ -50,7 +47,6 @@
     padding: 4px;
 }
 
-/* purple square for icon */
 .pantry-search-button-sq {
     background-color: #8b3dff;
     color: white;
@@ -65,7 +61,6 @@
     flex-shrink: 0;
 }
 
-/* Text Input */
 .pantry-zip-input {
     border: none !important;
     outline: none;
@@ -81,7 +76,6 @@
     color: #c2b2ff;
 }
 
-/* The Map MUST have a height or it will be 0px */
 .map-frame {
     height: 600px;
     width: 100%;
@@ -92,12 +86,10 @@
     position: relative;
 }
 
-/* Ensure the Navbar stays on top of Leaflet layers */
 .navbar {
     z-index: 1000;
 }
 
-/* Popup Styling for Grouped Data */
 .pantry-popup-container {
     min-width: 200px;
     font-family: inherit;
@@ -145,4 +137,58 @@
     font-size: 13px;
     text-decoration: none;
     font-weight: 600;
+}
+
+.leaflet-popup-content-wrapper {
+    background: #ffffff !important;
+    color: #2d0066 !important;
+    border: 2px solid #8b3dff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 0px #6a2cc7 !important; 
+    padding: 0 !important;
+}
+
+.leaflet-popup-tip {
+    background: #8b3dff !important;
+    border: 2px solid #8b3dff !important;
+    box-shadow: none !important;
+}
+
+.leaflet-popup-close-button {
+    color: #8b3dff !important;
+    font-size: 16px !important;
+    padding: 10px !important;
+}
+
+.leaflet-popup-content {
+    margin: 15px !important;
+    line-height: 1.4 !important;
+    width: auto !important;
+}
+
+.pantry-popup-container h3 {
+    color: #2d0066;
+    font-size: 0.9rem;
+    font-weight: 900;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
+
+.pantry-address-link {
+    color: #de4a4a !important;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.pantry-address-link:hover {
+    text-decoration: underline;
+}
+
+.pantry-phone-link {
+    color: #de4a4a  !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
 }
