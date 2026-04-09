@@ -96,4 +96,4 @@ const PantryMap = ({ pantries = [], target }) => {
   );
 };
 
-export default PantryMap;
+export default React.memo(PantryMap);
