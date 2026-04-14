@@ -1,0 +1,36 @@
+/* src/features/users/components/Profile.css */
+.profile-container {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #333;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.score-badge {
+    background: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.log-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #fafafa;
+}
+
+.points {
+    color: #4caf50;
+    font-weight: bold;
+}

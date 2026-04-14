@@ -13,6 +13,7 @@ const auth = {
         };
         const data = await drogonClient("auth", options);
         localStorage.setItem("sessionId", data.id);
+        localStorage.setItem("userId", data.userId);
         console.log(localStorage.getItem("sessionId"));
         return data;
     },
@@ -32,6 +33,7 @@ const auth = {
         );
         // sets it back to null for later checking
         localStorage.removeItem("sessionId");
+        localStorage.removeItem("userId");
         return data;
     },
 };

@@ -3,7 +3,7 @@ import auth from "../features/auth/services/auth";
 import Navbar from "../components/layout/Navbar";
 import BrandSide from "../features/auth/components/BrandSide.jsx";
 import AuthFormSide from "../features/auth/components/AuthFormSide.jsx";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../index.css";
 import "../features/auth/components/auth.css";
 import "../features/pantries/components/pantries.css";
@@ -14,11 +14,17 @@ const MainLayout = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         return localStorage.getItem("sessionId") !== null;
     });
+    const [userId, setUserId] = useState(() => {
+        return localStorage.getItem("userId");
+    });
 
     useEffect(() => {
         const session = localStorage.getItem("sessionId");
         setIsAuthenticated(session !== null);
+        setUserId(localStorage.getItem("userId"));
     }, [location.pathname]);
+    
+    
 
     /* for some reason, when i tried it today it didnt work 
     and it auto defaulted to the dashboard screen and said
@@ -36,6 +42,7 @@ const MainLayout = ({ children }) => {
         }
         // ALWAYS clear this, regardless of what the backend says
         localStorage.removeItem("sessionId");
+        localStorage.removeItem("userId");
         setIsAuthenticated(false);
         navigate("/login");
     };
@@ -44,12 +51,8 @@ const MainLayout = ({ children }) => {
     return (
         <div className="layout-container">
             {!isAuthPage && (
-                <Navbar
-                    isAuthenticated={isAuthenticated}
-                    onLogout={handleLogout}
-                />
+                <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
             )}
-
             <main className="content-area">
                 {isAuthPage ? (
                     <>
@@ -59,10 +62,16 @@ const MainLayout = ({ children }) => {
                         </AuthFormSide>
                     </>
                 ) : (
-                    <div className="standard-view">{children}</div>
+                    // pass userId into children via cloneElement
+                    <div className="standard-view">
+                        {React.Children.map(children, child =>
+                            React.isValidElement(child)
+                                ? React.cloneElement(child, { userId })
+                                : child
+                        )}
+                    </div>
                 )}
             </main>
-
             {!isAuthPage && (
                 <footer className="footer">
                     <p>© 2026 Modular React + Drogon C++</p>

@@ -8,6 +8,7 @@ import LoginForm from "./features/auth/components/LoginForm";
 import SignupForm from "./features/users/components/SignupForm";
 import Dashboard from "./features/users/components/Dashboard";
 import PantryExplorer from "./features/pantries/components/PantryExplorer";
+import Profile from "./features/users/components/Profile";
 
 const isAuthenticated = () => {
     if (localStorage.getItem("sessionId") === null) {
@@ -59,6 +60,15 @@ const router = createBrowserRouter([
         ),
         middleware: [isAuthenticated],
     },
+    {
+    path: "/profile",
+    element: (
+        <MainLayout>
+            <Profile />
+        </MainLayout>
+    ),
+    loader: isAuthenticated,
+},
 ]);
 
 function App() {

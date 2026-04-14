@@ -26,6 +26,12 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
                             DASHBOARD
                         </Link>
                         <Link 
+                            to="/profile" 
+                            className={`nav-link ${location.pathname === '/profile' ? 'active-red' : ''}`}
+                        >
+                            PROFILE
+                        </Link>
+                        <Link 
                             to="/map/pantry" 
                             className={`nav-link ${location.pathname === '/map/pantry' ? 'active-red' : ''}`}
                         >

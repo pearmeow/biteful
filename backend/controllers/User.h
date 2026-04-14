@@ -19,6 +19,7 @@ public:
     ADD_METHOD_TO(User::updateOne, "/users/{1}", Put, "CorsFilter");
     // DELETE /users/{id}
     ADD_METHOD_TO(User::deleteOne, "/users/{1}", Delete, "CorsFilter");
+    ADD_METHOD_TO(User::logFood, "/users/{1}/logs", Post, "CorsFilter", "LoginFilter");
     METHOD_LIST_END
 
     void create(const drogon::HttpRequestPtr& req, std::function<void(const drogon::HttpResponsePtr&)>&& callback);
@@ -30,5 +31,8 @@ public:
                    std::function<void(const drogon::HttpResponsePtr&)>&& callback, std::string&& id);
 
     void deleteOne(const drogon::HttpRequestPtr& req,
+                   std::function<void(const drogon::HttpResponsePtr&)>&& callback, std::string&& id);
+
+    void logFood(const drogon::HttpRequestPtr& req,
                    std::function<void(const drogon::HttpResponsePtr&)>&& callback, std::string&& id);
 };
