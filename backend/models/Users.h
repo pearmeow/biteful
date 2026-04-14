@@ -48,10 +48,10 @@ class Users
         static const std::string _username;
         static const std::string _email;
         static const std::string _password_hash;
+        static const std::string _created_at;
         static const std::string _display_name;
         static const std::string _dietary_preferences;
         static const std::string _health_score;
-        static const std::string _created_at;
         static const std::string _phone;
     };
 
@@ -139,6 +139,15 @@ class Users
     void setPasswordHash(const std::string &pPasswordHash) noexcept;
     void setPasswordHash(std::string &&pPasswordHash) noexcept;
 
+    /**  For column created_at  */
+    ///Get the value of the column created_at, returns the default value if the column is null
+    const ::trantor::Date &getValueOfCreatedAt() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<::trantor::Date> &getCreatedAt() const noexcept;
+    ///Set the value of the column created_at
+    void setCreatedAt(const ::trantor::Date &pCreatedAt) noexcept;
+    void setCreatedAtToNull() noexcept;
+
     /**  For column display_name  */
     ///Get the value of the column display_name, returns the default value if the column is null
     const std::string &getValueOfDisplayName() const noexcept;
@@ -167,15 +176,6 @@ class Users
     ///Set the value of the column health_score
     void setHealthScore(const int32_t &pHealthScore) noexcept;
     void setHealthScoreToNull() noexcept;
-
-    /**  For column created_at  */
-    ///Get the value of the column created_at, returns the default value if the column is null
-    const ::trantor::Date &getValueOfCreatedAt() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<::trantor::Date> &getCreatedAt() const noexcept;
-    ///Set the value of the column created_at
-    void setCreatedAt(const ::trantor::Date &pCreatedAt) noexcept;
-    void setCreatedAtToNull() noexcept;
 
     /**  For column phone  */
     ///Get the value of the column phone, returns the default value if the column is null
@@ -214,10 +214,10 @@ class Users
     std::shared_ptr<std::string> username_;
     std::shared_ptr<std::string> email_;
     std::shared_ptr<std::string> passwordHash_;
+    std::shared_ptr<::trantor::Date> createdAt_;
     std::shared_ptr<std::string> displayName_;
     std::shared_ptr<std::string> dietaryPreferences_;
     std::shared_ptr<int32_t> healthScore_;
-    std::shared_ptr<::trantor::Date> createdAt_;
     std::shared_ptr<std::string> phone_;
     struct MetaData
     {
@@ -265,23 +265,23 @@ class Users
             sql += "password_hash,";
             ++parametersCount;
         }
-        if(dirtyFlag_[4])
+        sql += "created_at,";
+        ++parametersCount;
+        if(!dirtyFlag_[4])
+        {
+            needSelection=true;
+        }
+        if(dirtyFlag_[5])
         {
             sql += "display_name,";
             ++parametersCount;
         }
-        if(dirtyFlag_[5])
+        if(dirtyFlag_[6])
         {
             sql += "dietary_preferences,";
             ++parametersCount;
         }
         sql += "health_score,";
-        ++parametersCount;
-        if(!dirtyFlag_[6])
-        {
-            needSelection=true;
-        }
-        sql += "created_at,";
         ++parametersCount;
         if(!dirtyFlag_[7])
         {
@@ -325,6 +325,10 @@ class Users
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
+        else
+        {
+            sql +="default,";
+        }
         if(dirtyFlag_[5])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
@@ -334,10 +338,6 @@ class Users
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
-        }
-        else
-        {
-            sql +="default,";
         }
         if(dirtyFlag_[7])
         {
