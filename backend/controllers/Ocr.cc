@@ -4,8 +4,10 @@
 
 #include <fstream>
 
+const bool FAKING = true;
+
 // Add definition of your processing function here
-void upload(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+void Ocr::upload(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     // just testing if veryfi ocr works
     // theoretically client should just send an image and we should contact endpoint
     // somewhere else
@@ -13,6 +15,11 @@ void upload(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&
     // finally the client verifies the info and then hits this endpoint to upload
     // the menu
     //
+
+    // if (FAKING) {
+    //     return;
+    // }
+
     const std::string ocrApi = std::getenv("OCR_API");
     if (ocrApi.empty()) {
         LOG_ERROR << "getenv failed on ocr api";
