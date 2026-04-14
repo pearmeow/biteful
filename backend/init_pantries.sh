@@ -14,7 +14,7 @@ echo "127.0.0.1:5432:$DB_NAME:$DB_USER:$DB_PASSWORD" > "$PGPASS_PATH"
 chmod 0600 "$PGPASS_PATH"
 
 # 3. File and Table Configuration
-FILE_NAME="./migrations/foodbanksnyc.csv"
+FILE_NAME="./foodbanksnyc.csv"
 TABLE_NAME="food_pantries"
 
 if [ ! -f "$FILE_NAME" ]; then
