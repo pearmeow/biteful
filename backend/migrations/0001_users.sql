@@ -6,13 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     display_name VARCHAR(100),
     dietary_preferences TEXT,
     health_score INT DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    phone VARCHAR(20)
 );
 
 
-
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS display_name TEXT,
-ADD COLUMN IF NOT EXISTS dietary_preferences TEXT,
-ADD COLUMN IF NOT EXISTS health_score INT DEFAULT 0;
-ADD COLUMN IF NOT EXISTS phone VARCHAR(20);

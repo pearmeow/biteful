@@ -46,9 +46,9 @@ class FoodLogs
     {
         static const std::string _id;
         static const std::string _user_id;
-        static const std::string _logged_at;
         static const std::string _item_name;
         static const std::string _health_points;
+        static const std::string _logged_at;
     };
 
     static const int primaryKeyNumber;
@@ -117,15 +117,6 @@ class FoodLogs
     void setUserId(const int32_t &pUserId) noexcept;
     void setUserIdToNull() noexcept;
 
-    /**  For column logged_at  */
-    ///Get the value of the column logged_at, returns the default value if the column is null
-    const ::trantor::Date &getValueOfLoggedAt() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<::trantor::Date> &getLoggedAt() const noexcept;
-    ///Set the value of the column logged_at
-    void setLoggedAt(const ::trantor::Date &pLoggedAt) noexcept;
-    void setLoggedAtToNull() noexcept;
-
     /**  For column item_name  */
     ///Get the value of the column item_name, returns the default value if the column is null
     const std::string &getValueOfItemName() const noexcept;
@@ -134,6 +125,7 @@ class FoodLogs
     ///Set the value of the column item_name
     void setItemName(const std::string &pItemName) noexcept;
     void setItemName(std::string &&pItemName) noexcept;
+    void setItemNameToNull() noexcept;
 
     /**  For column health_points  */
     ///Get the value of the column health_points, returns the default value if the column is null
@@ -142,6 +134,16 @@ class FoodLogs
     const std::shared_ptr<int32_t> &getHealthPoints() const noexcept;
     ///Set the value of the column health_points
     void setHealthPoints(const int32_t &pHealthPoints) noexcept;
+    void setHealthPointsToNull() noexcept;
+
+    /**  For column logged_at  */
+    ///Get the value of the column logged_at, returns the default value if the column is null
+    const ::trantor::Date &getValueOfLoggedAt() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<::trantor::Date> &getLoggedAt() const noexcept;
+    ///Set the value of the column logged_at
+    void setLoggedAt(const ::trantor::Date &pLoggedAt) noexcept;
+    void setLoggedAtToNull() noexcept;
 
 
     static size_t getColumnNumber() noexcept {  return 5;  }
@@ -168,9 +170,9 @@ class FoodLogs
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> id_;
     std::shared_ptr<int32_t> userId_;
-    std::shared_ptr<::trantor::Date> loggedAt_;
     std::shared_ptr<std::string> itemName_;
     std::shared_ptr<int32_t> healthPoints_;
+    std::shared_ptr<::trantor::Date> loggedAt_;
     struct MetaData
     {
         const std::string colName_;
@@ -207,18 +209,18 @@ class FoodLogs
             sql += "user_id,";
             ++parametersCount;
         }
-        sql += "logged_at,";
-        ++parametersCount;
-        if(!dirtyFlag_[2])
-        {
-            needSelection=true;
-        }
-        if(dirtyFlag_[3])
+        if(dirtyFlag_[2])
         {
             sql += "item_name,";
             ++parametersCount;
         }
         sql += "health_points,";
+        ++parametersCount;
+        if(!dirtyFlag_[3])
+        {
+            needSelection=true;
+        }
+        sql += "logged_at,";
         ++parametersCount;
         if(!dirtyFlag_[4])
         {
@@ -247,14 +249,14 @@ class FoodLogs
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        else
-        {
-            sql +="default,";
-        }
         if(dirtyFlag_[3])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
+        }
+        else
+        {
+            sql +="default,";
         }
         if(dirtyFlag_[4])
         {
