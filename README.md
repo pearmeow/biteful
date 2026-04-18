@@ -84,7 +84,7 @@ These instructions were tested on Linux (Ubuntu/Debian) machines.
     ```bash
     sudo apt install libjsoncpp-dev uuid-dev \
     zlib1g-dev libssl-dev libyaml-cpp-dev \
-    libsodium-dev
+    libsodium-dev pkg-config
     ```
 
     Install the drogon framework so that `drogon_ctl` can be used.
