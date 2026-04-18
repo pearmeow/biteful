@@ -4,81 +4,170 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    align-self: flex-start;
-}
-
-.pantry-search-block {
-    background-color: #f8f7ff;
-    border: 2px solid #8b3dff;
-    border-radius: 16px;
-    padding: 10px 10px;
-    width: 350px;
-    margin: 10px 0;
-    box-shadow: 0 5px 0px #6a2cc7;
-}
-
-.pantry-search-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.pantry-search-icon {
-    color: #4ade80;
-    font-size: 1rem;
+    gap: 16px;
 }
 
 .pantry-search-title {
+    display: block;
+    margin-bottom: 8px;
     color: #2d0066;
-    font-weight: 800;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
-.pantry-input-wrapper {
+.pantry-input-wrapper,
+.pantry-search-button-sq,
+.pantry-geo-button-sq,
+.pantry-filter-footer {
     display: flex;
     align-items: center;
-    background: white;
-    border: 2px solid #c2b2ff;
-    border-radius: 12px;
+}
+
+.pantry-input-wrapper,
+.map-frame,
+.pantry-zip-input {
+    width: 100%;
+}
+
+.pantry-input-wrapper {
+    background: #fff;
+    border: 1px solid #d7d7d7;
+    border-radius: 10px;
     padding: 4px;
 }
 
+.pantry-search-button-sq,
+.pantry-geo-button-sq {
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
 .pantry-search-button-sq {
-    background-color: #8b3dff;
-    color: white;
     width: 34px;
     height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #8b3dff;
+    color: #fff;
     border-radius: 8px;
-    cursor: pointer;
     font-size: 0.9rem;
-    flex-shrink: 0;
+}
+
+.pantry-geo-button-sq {
+    width: 48px;
+    height: 48px;
+    background: transparent !important;
 }
 
 .pantry-zip-input {
-    border: none !important;
-    outline: none;
+    min-width: 0;
     padding: 8px 12px;
-    font-size: 1rem;
-    color: #8b3dff;
-    width: 100%;
-    font-weight: 600;
+    border: 0 !important;
+    outline: none;
     background: transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #8b3dff;
 }
 
 .pantry-zip-input::placeholder {
     color: #c2b2ff;
 }
 
+.pantry-zip-error {
+    margin: 6px 0 0;
+    color: #de4a4a;
+    font-size: 0.8rem;
+}
+
+.pantry-filters-panel,
+.pantry-filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.pantry-filters-panel {
+    margin-top: 12px;
+    gap: 12px;
+}
+
+.pantry-filter-group {
+    gap: 8px;
+}
+
+.pantry-filter-label,
+.pantry-results-count {
+    color: #2d0066;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.pantry-filter-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pantry-filter-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pantry-filter-chip-row-days {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.pantry-filter-chip {
+    padding: 7px 12px;
+    border: 1px solid #d7d7d7;
+    border-radius: 999px;
+    background: #fff;
+    color: #6a2cc7;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.pantry-filter-chip:hover {
+    border-color: #8b3dff;
+}
+
+.pantry-filter-chip.is-selected {
+    background: #8b3dff;
+    border-color: #8b3dff;
+    color: #fff;
+}
+
+.pantry-filter-footer {
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 2px;
+}
+
+.pantry-clear-filters {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: #8b3dff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pantry-clear-filters:hover,
+.pantry-address-link:hover {
+    text-decoration: underline;
+}
+
 .map-frame {
     height: 600px;
-    width: 100%;
     border-radius: 12px;
     border: 2px solid #ddd;
     overflow: hidden;
@@ -88,75 +177,55 @@
 
 .pantry-popup-container {
     min-width: 220px;
-    font-family: inherit;
 }
 
 .pantry-popup-container h3 {
-    margin: 0 0 5px 0;
+    margin: 0 0 8px;
     color: #2d0066;
-    font-weight: bold;
     font-size: 0.9rem;
     font-weight: 900;
-    margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: -0.5px;
 }
 
 .pantry-list-scroll {
     max-height: 200px;
-    overflow-y: auto;
     margin-top: 10px;
+    overflow-y: auto;
     border-top: 1px solid #eee;
 }
 
-.pantry-item-row {
-    padding: 8px 0;
-    border-bottom: 1px solid #f4f4f4;
-    font-size: 13px;
-}
-
-.pantry-item-row span {
-    display: block;
-    font-size: 11px;
-    color: #8b3dff;
-    font-weight: bold;
-    text-transform: uppercase;
+.pantry-address-link,
+.pantry-phone-link {
+    margin: 0 0 8px;
+    color: #de4a4a !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
 }
 
 .pantry-address-link {
     display: block;
-    margin: 5px 0;
-    color: #de4a4a !important;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.pantry-address-link:hover {
-    text-decoration: underline;
 }
 
 .pantry-phone-link {
     display: inline-block;
-    margin: 5px 0;
-    color: #de4a4a !important;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-decoration: none;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    background: #fff !important;
+    border: 1px solid #d7d7d7 !important;
 }
 
 .leaflet-popup-content-wrapper {
-    background: #ffffff !important;
     color: #2d0066 !important;
-    border: 2px solid #8b3dff !important;
     border-radius: 12px !important;
-    box-shadow: 0 4px 0px #6a2cc7 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
     padding: 0 !important;
 }
 
 .leaflet-popup-tip {
-    background: #8b3dff !important;
-    border: 2px solid #8b3dff !important;
     box-shadow: none !important;
 }
 
@@ -167,44 +236,25 @@
 }
 
 .leaflet-popup-content {
+    width: auto !important;
     margin: 15px !important;
     line-height: 1.4 !important;
-    width: auto !important;
 }
 
-/* The SVG Icon */
-.geo-icon-svg {
-    width: 20px;
-    height: 20px;
-    color: #007AFF;
-    transition: transform 0.2s ease;
-}
-
-.pantry-geo-button-sq:hover .geo-icon-svg {
-    transform: scale(1.5);
-    color: #0056b3;
-}
-
-.pantry-geo-button-sq {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background: transparent !important;
-    /* border-left: 1px solid #f0f0f0;  */
-    flex-shrink: 0;
-}
-
-/* The Spinner - No background, just the ring */
+.geo-icon-svg,
 .pantry-spinner {
     width: 20px;
     height: 20px;
+}
+
+.geo-icon-svg {
+    color: #007AFF;
+}
+
+.pantry-spinner {
     border: 2px solid transparent;
     border-top: 2px solid #007AFF;
     border-radius: 50%;
-
     display: block;
     box-sizing: border-box;
     animation: pantry-rotation 0.8s linear infinite;
@@ -221,7 +271,12 @@
 }
 
 .pantry-geo-button-sq.is-loading {
-    background-color: transparent !important;
     cursor: default;
-    box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+    .pantry-filter-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
