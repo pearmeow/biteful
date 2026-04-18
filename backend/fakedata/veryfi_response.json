@@ -1,0 +1,108 @@
+{
+    "external_id": null,
+    "meta": {
+        "external_id": null,
+        "pages": [
+            {
+                "ocr_score": 0.961,
+                "width": 1200,
+                "height": 1691
+            }
+        ],
+        "tags": [],
+        "original_file_name": null,
+        "duplicates": [
+            {
+                "id": 8890709,
+                "url": "https://scdn.veryfi.com/other-documents/b90ac69aff837020/75cc2e00-46f2-4a89-b1a8-d8b5c2a0d479/4e769ce9-6c4b-4a3b-b95b-fa8a14ba3ed9.pdf?Expires=1776193239&Signature=LZSencJJezejlDlp~VBuLsn9OCxxUa--dGvtD7OlIu5ZeLu7EULul7PJglrdC~SOG3xsi-3sjPKCqVQ-Jek6l38JJfUKPxJ7hdrXGQgX-OLV2Sn344WII-fu4-J3JVoHGG76gXJ6~4FfGD43cjSy0LaOZHLoWGCvfnKOyOc-9o-S7S-LKOYNflyj4WK3ZDvdTDumLb8iGJK68RTjoSKsDJNvihRxc0g3B0veUxLfyPPVKz4p5zjrRfVPwfHAbDhhL0cnAqWwneonM1KR6JiIvN5lF12g3EtM2RFZhY7gcPU~gO8RX1dk-cTMn50cWc4kT-jR4cQql17fmyufSl1JEw__&Key-Pair-Id=APKAJCILBXEJFZF4DCHQ",
+                "score": 0.9
+            }
+        ]
+    },
+    "pdf_url": "https://scdn.veryfi.com/other-documents/b90ac69aff837020/bfcd01ca-7d50-48d1-af33-30d02d2f1f13/8fa86c6d-e717-4908-a47f-0421c29992e1.pdf?Expires=1776193239&Signature=RdP4rPC1ayQInG6b76ScCCvMEyRZ0-kkmGZqNuEYHBZF0eoVbfnOuhv~GBWP9aiZ2E1k85C43ICJeioMPF0c-fIr8FFjuBzmGGhmz5vVewV5WdPCj-PKAPF1iG9JMRyXSKt8wWphyJIOHc9ree61X5fdFQuof9rAbljhEcdJqgHHq6HJ~7PMjKXJxs5pnk~TOUscKtu1QkB0HqrowuWoRJNFeIKEs6vMRcju-Npwl6msLWCcmgd2wOK2RpMzVuFyLWE~CdgG4-rpJUZCxmku-xaUt~a60mzJJTmYQAhz~vGTrF9E1ioehQvezA2EOkdbYVG7pI~N3jeIv5jzUOKNig__&Key-Pair-Id=APKAJCILBXEJFZF4DCHQ",
+    "id": 8902134,
+    "created_date": "2026-04-14 18:45:39",
+    "updated_date": "2026-04-14 18:45:39",
+    "img_thumbnail_url": "https://scdn.veryfi.com/other-documents/b90ac69aff837020/bfcd01ca-7d50-48d1-af33-30d02d2f1f13/thumbnail.jpg?Expires=1776193239&Signature=Q6oKWQxCFAfs0gFQfZjGe8dWqsTnu-dH~QoT5BDZEkQnPpJuszx-YGvvQJw5FYA9Yl3IURvDBHs0zNniqBQY~0lIhnkE0WlKYHQGQtdC6UQPTiLn8z1ABVprBLqOx54MSyC2kIvDWkfj3wioou3vekyTCdW4zDe0XBDyXiQUj~1F5cg-QGxHPD5YDxAW-5-Y6PnqlRgHjsZKfEDcwXvRbfnJIE79OWGL2VO4sJ9N6QeHcpzjy63Xnm8X~rvA2cdpOkT6a9HghesBYemkHsl-MNhm1nNyw-F-5knR0Z45EjaImffG3iVsKl88gQdZ18HEInuVBaySEEMuqSLh6dFHdw__&Key-Pair-Id=APKAJCILBXEJFZF4DCHQ",
+    "text": "MENU\tRESTAURANT\n\tINC.\nAPPETIZERS\nBruschetta\t$8.99\nStuffed Mushrooms\t$9.99\nChicken Satay -\t$12.99\n\nSOUPS & SALADS\nFrench Onion Soup\t$8.99\nCaesar Salad\t$8.99\nTomato Basil Soup\t$10.99\nMAIN COURSES\nGrilled Salmon\t$18.99\nFlorentine T-bone Steak\t$24.99\nBeef Tacos\t$16.49\n\nDESSERTS\nTiramisu\t$8.99\nChocolate Lava Cake\t$7.99\nGelato\t$6.99\n\nFREE DELIVERY\nFollow Us Template.net | tessa@you.mail",
+    "blueprint_name": "restaurant_menu",
+    "template_name": "restaurant_menu",
+    "menu_items": [
+        {
+            "menu_section": "APPETIZERS",
+            "dish_name": "Bruschetta",
+            "dish_description": null,
+            "dish_price": 8.99
+        },
+        {
+            "menu_section": "APPETIZERS",
+            "dish_name": "Stuffed Mushrooms",
+            "dish_description": null,
+            "dish_price": 9.99
+        },
+        {
+            "menu_section": "APPETIZERS",
+            "dish_name": "Chicken Satay",
+            "dish_description": null,
+            "dish_price": 12.99
+        },
+        {
+            "menu_section": "SOUPS & SALADS",
+            "dish_name": "French Onion Soup",
+            "dish_description": null,
+            "dish_price": 8.99
+        },
+        {
+            "menu_section": "SOUPS & SALADS",
+            "dish_name": "Caesar Salad",
+            "dish_description": null,
+            "dish_price": 8.99
+        },
+        {
+            "menu_section": "SOUPS & SALADS",
+            "dish_name": "Tomato Basil Soup",
+            "dish_description": null,
+            "dish_price": 10.99
+        },
+        {
+            "menu_section": "MAIN COURSES",
+            "dish_name": "Grilled Salmon",
+            "dish_description": null,
+            "dish_price": 18.99
+        },
+        {
+            "menu_section": "MAIN COURSES",
+            "dish_name": "Florentine T-bone Steak",
+            "dish_description": null,
+            "dish_price": 24.99
+        },
+        {
+            "menu_section": "MAIN COURSES",
+            "dish_name": "Beef Tacos",
+            "dish_description": null,
+            "dish_price": 16.49
+        },
+        {
+            "menu_section": "DESSERTS",
+            "dish_name": "Tiramisu",
+            "dish_description": null,
+            "dish_price": 8.99
+        },
+        {
+            "menu_section": "DESSERTS",
+            "dish_name": "Chocolate Lava Cake",
+            "dish_description": null,
+            "dish_price": 7.99
+        },
+        {
+            "menu_section": "DESSERTS",
+            "dish_name": "Gelato",
+            "dish_description": null,
+            "dish_price": 6.99
+        }
+    ],
+    "restaurant_address": null,
+    "restaurant_name": "fMENU RESTAURANT INC.",
+    "restaurant_operation_hours": null,
+    "restaurant_phone": null
+}

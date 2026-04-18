@@ -111,7 +111,7 @@ int main() {
         LOG_ERROR << "config.json is missing 'db_clients' array!";
     }
 
-    drogon::app().loadConfigJson(config);
+    drogon::app().loadConfigJson(config).setClientMaxBodySize(5 * 1048576).setClientMaxMemoryBodySize(5 * 1048576);
     drogon::app().run();
 
     return 0;

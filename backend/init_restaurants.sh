@@ -19,8 +19,6 @@ TABLE_NAME="restaurants"
 echo "Ingesting NYC Restaurant Data..."
 
 psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" <<EOF
--- Clear existing restaurant data
-TRUNCATE TABLE $TABLE_NAME;
 
 CREATE TEMP TABLE staging_restaurants (
     camis TEXT, dba TEXT, boro TEXT, building TEXT, street TEXT, 
