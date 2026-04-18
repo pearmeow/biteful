@@ -1305,6 +1305,11 @@ Json::Value FoodPantries::toJson() const
     return ret;
 }
 
+std::string FoodPantries::toString() const
+{
+    return toJson().toStyledString();
+}
+
 Json::Value FoodPantries::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {

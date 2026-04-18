@@ -52,14 +52,16 @@ void User::create(const HttpRequestPtr& req, std::function<void(const HttpRespon
 
 // GET /users/{id} 
 // read and view profile (fr1.2) 
-void User::getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                  std::string&& id) {
+void User::getOne(const HttpRequestPtr& req,
+                 std::function<void(const HttpResponsePtr&)>&& callback,
+                 std::string&& id) {
     auto dbClient = app().getDbClient();
     std::string userId = id;
 
     // 1. Fetch User Profile
     dbClient->execSqlAsync(
-        "SELECT id, username, email, phone, display_name, dietary_preferences, health_score FROM users WHERE id = $1",
+        "SELECT id, username, email, phone, display_name, dietary_preferences, health_score "
+        "FROM users WHERE id = $1",
         [callback, dbClient, userId](const drogon::orm::Result& res) {
             if (res.size() == 0) {
                 auto resp = HttpResponse::newHttpResponse();
@@ -77,22 +79,29 @@ void User::getOne(const HttpRequestPtr& req, std::function<void(const HttpRespon
             user["dietary_preferences"] = res[0]["dietary_preferences"].isNull() ? "" : res[0]["dietary_preferences"].as<std::string>();
             user["health_score"]        = res[0]["health_score"].isNull() ? 0 : res[0]["health_score"].as<int>();
 
-            // 2. Fetch Aggregated Stats
-            // maintain health score + see attributes (fr1.5 + fr1.6)
+            // 2. Fetch Aggregated Stats (FIXED WITH JOIN)
             dbClient->execSqlAsync(
                 "SELECT "
-                "COALESCE(SUM(CASE WHEN health_points > 0 THEN health_points ELSE 0 END), 0) as healthy_sum, "
-                "COALESCE(SUM(CASE WHEN health_points < 0 THEN ABS(health_points) ELSE 0 END), 0) as unhealthy_sum "
-                "FROM food_logs WHERE user_id = $1",
+                "COALESCE(SUM(CASE WHEN fi.health_points > 0 THEN fi.health_points ELSE 0 END), 0) AS healthy_sum, "
+                "COALESCE(SUM(CASE WHEN fi.health_points < 0 THEN ABS(fi.health_points) ELSE 0 END), 0) AS unhealthy_sum "
+                "FROM food_logs fl "
+                "JOIN food_items fi ON fl.food_item_id = fi.id "
+                "WHERE fl.user_id = $1",
                 [callback, dbClient, userId, user](const drogon::orm::Result& stats) mutable {
-                    user["stats"]["healthy"] = stats[0]["healthy_sum"].as<int>();
+                    user["stats"]["healthy"]   = stats[0]["healthy_sum"].as<int>();
                     user["stats"]["unhealthy"] = stats[0]["unhealthy_sum"].as<int>();
 
-                    // 3. Fetch Recent Activity 
+                    // 3. Fetch Recent Activity (FIXED WITH JOIN)
                     dbClient->execSqlAsync(
-                        "SELECT item_name, health_points, logged_at::text FROM food_logs WHERE user_id = $1 ORDER BY logged_at DESC LIMIT 20",
+                        "SELECT fi.dish_name AS item_name, fi.health_points, fl.logged_at::text "
+                        "FROM food_logs fl "
+                        "JOIN food_items fi ON fl.food_item_id = fi.id "
+                        "WHERE fl.user_id = $1 "
+                        "ORDER BY fl.logged_at DESC "
+                        "LIMIT 20",
                         [callback, user](const drogon::orm::Result& logs) mutable {
                             Json::Value logArray(Json::arrayValue);
+
                             for (const auto& row : logs) {
                                 Json::Value entry;
                                 entry["item_name"]     = row["item_name"].as<std::string>();
@@ -100,6 +109,7 @@ void User::getOne(const HttpRequestPtr& req, std::function<void(const HttpRespon
                                 entry["logged_at"]     = row["logged_at"].as<std::string>();
                                 logArray.append(entry);
                             }
+
                             user["food_logs"] = logArray;
 
                             auto resp = HttpResponse::newHttpJsonResponse(user);
@@ -108,19 +118,25 @@ void User::getOne(const HttpRequestPtr& req, std::function<void(const HttpRespon
                         },
                         [callback](const drogon::orm::DrogonDbException& e) {
                             LOG_ERROR << "Logs Error: " << e.base().what();
-                            callback(HttpResponse::newHttpResponse());
+                            auto resp = HttpResponse::newHttpResponse();
+                            resp->setStatusCode(k500InternalServerError);
+                            callback(resp);
                         },
                         userId);
                 },
                 [callback](const drogon::orm::DrogonDbException& e) {
                     LOG_ERROR << "Stats Error: " << e.base().what();
-                    callback(HttpResponse::newHttpResponse());
+                    auto resp = HttpResponse::newHttpResponse();
+                    resp->setStatusCode(k500InternalServerError);
+                    callback(resp);
                 },
                 userId);
         },
         [callback](const drogon::orm::DrogonDbException& e) {
             LOG_ERROR << "User Error: " << e.base().what();
-            callback(HttpResponse::newHttpResponse());
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(k500InternalServerError);
+            callback(resp);
         },
         userId);
 }
@@ -178,53 +194,51 @@ void User::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpRes
         id);
 }
 
-void User::logFood(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+void User::logFood(const HttpRequestPtr& req,
+                   std::function<void(const HttpResponsePtr&)>&& callback,
                    std::string&& id) {
     auto json = req->getJsonObject();
-    if (!json) {
+    if (!json || !json->isMember("food_item_id")) {
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k400BadRequest);
         callback(resp);
         return;
     }
 
-    std::string itemName  = json->get("item_name", "").asString();
-    int healthPoints      = json->get("health_points", 0).asInt();
-
-    if (itemName.empty()) {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(k400BadRequest);
-        callback(resp);
-        return;
-    }
-
+    int foodItemId = (*json)["food_item_id"].asInt();
     std::string userId = id;
+
     auto dbClient = app().getDbClient();
 
-    dbClient->execSqlAsync(
-        "INSERT INTO food_logs (user_id, item_name, health_points) VALUES ($1, $2, $3)",
-        [callback, dbClient, userId, healthPoints](const drogon::orm::Result& res) {
-            dbClient->execSqlAsync(
-                "UPDATE users SET health_score = health_score + $1 WHERE id = $2",
-                [callback](const drogon::orm::Result&) {
-                    Json::Value ret;
-                    ret["result"] = "logged";
-                    auto resp = HttpResponse::newHttpJsonResponse(ret);
-                    resp->setStatusCode(k201Created);
-                    callback(resp);
-                },
-                [callback](const drogon::orm::DrogonDbException& e) {
-                    auto resp = HttpResponse::newHttpResponse();
-                    resp->setStatusCode(k500InternalServerError);
-                    callback(resp);
-                },
-                healthPoints, userId);
-        },
-        [callback](const drogon::orm::DrogonDbException& e) {
-            LOG_ERROR << e.base().what();
-            auto resp = HttpResponse::newHttpResponse();
-            resp->setStatusCode(k500InternalServerError);
-            callback(resp);
-        },
-        userId, itemName, healthPoints);
+    try {
+        auto trans = dbClient->newTransaction();
+
+        // 1. Insert log
+        trans->execSqlSync(
+            "INSERT INTO food_logs (user_id, food_item_id) VALUES ($1, $2)",
+            userId, foodItemId
+        );
+
+        // 2. Update health score
+        trans->execSqlSync(
+            "UPDATE users SET health_score = health_score + "
+            "COALESCE((SELECT health_points FROM food_items WHERE id = $1), 0) "
+            "WHERE id = $2",
+            foodItemId, userId
+        );
+
+        Json::Value ret;
+        ret["result"] = "logged";
+
+        auto resp = HttpResponse::newHttpJsonResponse(ret);
+        resp->setStatusCode(k201Created);
+        callback(resp);
+    }
+    catch (const drogon::orm::DrogonDbException& e) {
+        LOG_ERROR << "Transaction Error: " << e.base().what();
+
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k500InternalServerError);
+        callback(resp);
+    }
 }

@@ -678,6 +678,11 @@ Json::Value Menus::toJson() const
     return ret;
 }
 
+std::string Menus::toString() const
+{
+    return toJson().toStyledString();
+}
+
 Json::Value Menus::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {

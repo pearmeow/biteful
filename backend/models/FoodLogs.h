@@ -46,9 +46,8 @@ class FoodLogs
     {
         static const std::string _id;
         static const std::string _user_id;
+        static const std::string _food_item_id;
         static const std::string _logged_at;
-        static const std::string _item_name;
-        static const std::string _health_points;
     };
 
     static const int primaryKeyNumber;
@@ -117,6 +116,15 @@ class FoodLogs
     void setUserId(const int32_t &pUserId) noexcept;
     void setUserIdToNull() noexcept;
 
+    /**  For column food_item_id  */
+    ///Get the value of the column food_item_id, returns the default value if the column is null
+    const int32_t &getValueOfFoodItemId() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<int32_t> &getFoodItemId() const noexcept;
+    ///Set the value of the column food_item_id
+    void setFoodItemId(const int32_t &pFoodItemId) noexcept;
+    void setFoodItemIdToNull() noexcept;
+
     /**  For column logged_at  */
     ///Get the value of the column logged_at, returns the default value if the column is null
     const ::trantor::Date &getValueOfLoggedAt() const noexcept;
@@ -126,25 +134,8 @@ class FoodLogs
     void setLoggedAt(const ::trantor::Date &pLoggedAt) noexcept;
     void setLoggedAtToNull() noexcept;
 
-    /**  For column item_name  */
-    ///Get the value of the column item_name, returns the default value if the column is null
-    const std::string &getValueOfItemName() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getItemName() const noexcept;
-    ///Set the value of the column item_name
-    void setItemName(const std::string &pItemName) noexcept;
-    void setItemName(std::string &&pItemName) noexcept;
 
-    /**  For column health_points  */
-    ///Get the value of the column health_points, returns the default value if the column is null
-    const int32_t &getValueOfHealthPoints() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<int32_t> &getHealthPoints() const noexcept;
-    ///Set the value of the column health_points
-    void setHealthPoints(const int32_t &pHealthPoints) noexcept;
-
-
-    static size_t getColumnNumber() noexcept {  return 5;  }
+    static size_t getColumnNumber() noexcept {  return 4;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -168,9 +159,8 @@ class FoodLogs
     void updateId(const uint64_t id);
     std::shared_ptr<int32_t> id_;
     std::shared_ptr<int32_t> userId_;
+    std::shared_ptr<int32_t> foodItemId_;
     std::shared_ptr<::trantor::Date> loggedAt_;
-    std::shared_ptr<std::string> itemName_;
-    std::shared_ptr<int32_t> healthPoints_;
     struct MetaData
     {
         const std::string colName_;
@@ -182,7 +172,7 @@ class FoodLogs
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[5]={ false };
+    bool dirtyFlag_[4]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -207,20 +197,14 @@ class FoodLogs
             sql += "user_id,";
             ++parametersCount;
         }
-        sql += "logged_at,";
-        ++parametersCount;
-        if(!dirtyFlag_[2])
+        if(dirtyFlag_[2])
         {
-            needSelection=true;
-        }
-        if(dirtyFlag_[3])
-        {
-            sql += "item_name,";
+            sql += "food_item_id,";
             ++parametersCount;
         }
-        sql += "health_points,";
+        sql += "logged_at,";
         ++parametersCount;
-        if(!dirtyFlag_[4])
+        if(!dirtyFlag_[3])
         {
             needSelection=true;
         }
@@ -247,16 +231,7 @@ class FoodLogs
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        else
-        {
-            sql +="default,";
-        }
         if(dirtyFlag_[3])
-        {
-            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
-        if(dirtyFlag_[4])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
