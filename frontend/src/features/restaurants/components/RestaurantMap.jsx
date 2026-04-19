@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Link } from 'react-router-dom';
 
 function MapUpdater({ target }) {
   const map = useMap();
@@ -43,6 +44,9 @@ const RestaurantMap = ({ restaurants = [], target }) => {
                   <span className="rpc-grade">Grade: {restaurant.grade}</span>
                 )}
               </div>
+
+              <Link to={`/menu/${restaurant.id}`}>View Menu</Link>
+              <Link to={`/menu/${restaurant.id}/upload`}>Upload Menu</Link>
 
               {restaurant.phone && (
                 <div className="rpc-phone">📞 {restaurant.phone}</div>
