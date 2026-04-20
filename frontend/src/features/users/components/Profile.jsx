@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { drogonClient } from '../../../api/client';
 import './Profile.css';
 
@@ -17,7 +17,13 @@ const Profile = () => {
     const rawId = localStorage.getItem("userId");
     const userId = (rawId === null || rawId === "undefined") ? null : rawId;
 
-    const fetchUserData = () => {
+    if (!userId && !error) {
+        setError("No user ID found. Please log in again.");
+    }
+
+    const fetchUserData = useCallback(() => {
+        if (!userId) return;
+
         drogonClient(`users/${userId}`, { method: "GET", credentials: "include" })
             .then(data => {
                 setUser(data);
@@ -28,15 +34,13 @@ const Profile = () => {
                 });
             })
             .catch(err => setError(err.message));
-    };
+    }, [userId]);
 
     useEffect(() => {
-        if (!userId) {
-            setError("No user ID found. Please log in again.");
-            return;
+        if (userId) {
+            fetchUserData();
         }
-        fetchUserData();
-    }, [userId]);
+    }, [userId, fetchUserData]);
 
     const handleSave = () => {
         drogonClient(`users/${userId}`, {
@@ -45,7 +49,7 @@ const Profile = () => {
         })
         .then(() => {
             setIsEditing(false);
-            fetchUserData(); // Refresh with new data
+            fetchUserData(); 
         })
         .catch(err => alert("Update failed: " + err.message));
     };
@@ -70,9 +74,6 @@ const Profile = () => {
         return "pigeon: your pigeon is doing okay";
     };
 
-    const nextLevelPoints = 500;
-    const progress = (user.health_score % nextLevelPoints) / nextLevelPoints * 100;
-
     return (
         <div className="profile-container">
             <div className="profile-top-grid">
@@ -90,8 +91,6 @@ const Profile = () => {
                     <section className="personal-info-card">
                         <div className="card-header">
                             <h2 style={{ margin: 0, color: '#333', fontSize: '1.2rem' }}>PERSONAL INFO</h2>
-                            
-                            {/* RIGHT SIDE CONTROLS */}
                             <div className="header-actions">
                                 {!isEditing ? (
                                     <button className="edit-icon" onClick={() => setIsEditing(true)}>
@@ -99,12 +98,8 @@ const Profile = () => {
                                     </button>
                                 ) : (
                                     <div className="edit-actions">
-                                        <button className="save-btn" onClick={handleSave}>
-                                            Save
-                                        </button>
-                                        <button className="cancel-btn" onClick={() => setIsEditing(false)}>
-                                            Cancel
-                                        </button>
+                                        <button className="save-btn" onClick={handleSave}>Save</button>
+                                        <button className="cancel-btn" onClick={() => setIsEditing(false)}>Cancel</button>
                                     </div>
                                 )}
                             </div>
@@ -120,32 +115,31 @@ const Profile = () => {
                                         onChange={(e) => setFormData({...formData, display_name: e.target.value})}
                                     />
                                 ) : <p>{user.display_name || "Not Set"}</p>}
-        </div>
-        
-        <div className="info-item">
-            <label>EMAIL</label>
-            <p>{user.email}</p>
-        </div>
+                            </div>
+                            
+                            <div className="info-item">
+                                <label>EMAIL</label>
+                                <p>{user.email}</p>
+                            </div>
 
-        <div className="info-item">
-            <label>PHONE</label>
-            {isEditing ? (
-                <input 
-                    type="text"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
-            ) : <p>{user.phone || "(---) --- ----"}</p>}
-        </div>
-    </div>
+                            <div className="info-item">
+                                <label>PHONE</label>
+                                {isEditing ? (
+                                    <input 
+                                        type="text"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                    />
+                                ) : <p>{user.phone || "(---) --- ----"}</p>}
+                            </div>
+                        </div>
 
-    {/* BRIGHT RED DELETE BUTTON - Only shows during edit mode */}
-    {isEditing && (
-        <button className="delete-account-btn" onClick={handleDeleteAccount}>
-            DELETE ACCOUNT PERMANENTLY
-        </button>
-    )}
-</section>
+                        {isEditing && (
+                            <button className="delete-account-btn" onClick={handleDeleteAccount}>
+                                DELETE ACCOUNT PERMANENTLY
+                            </button>
+                        )}
+                    </section>
 
                     <section className="recent-activity-card">
                         <h2>RECENT ACTIVITY</h2>
@@ -165,26 +159,20 @@ const Profile = () => {
                                 </div>
                             ))}
                         </div>
-                        <button className="view-history-btn">View Full Activity History</button>
                     </section>
                 </div>
 
                 <div className="right-column">
                     <section className="stats-card">
                         <h2>POINTS & STATS</h2>
-                        
-                        {/* BIG TOTAL POINTS DISPLAY */}
                         <div className="total-points-box">
                             <span className="big-number">{user.health_score || 0}</span>
                             <p>Total Points</p>
                         </div>
-
-                        {/* COLORED STAT ROWS */}
                         <div className="stat-row healthy">
                             <span className="stat-label">healthy</span>
                             <span className="stat-value">{user.stats?.healthy || 0}</span>
                         </div>
-                        
                         <div className="stat-row unhealthy">
                             <span className="stat-label">unhealthy</span>
                             <span className="stat-value">{user.stats?.unhealthy || 0}</span>
