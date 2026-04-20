@@ -988,6 +988,11 @@ Json::Value FoodItems::toJson() const
     return ret;
 }
 
+std::string FoodItems::toString() const
+{
+    return toJson().toStyledString();
+}
+
 Json::Value FoodItems::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {

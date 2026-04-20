@@ -678,6 +678,11 @@ Json::Value Users::toJson() const
     return ret;
 }
 
+std::string Users::toString() const
+{
+    return toJson().toStyledString();
+}
+
 Json::Value Users::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {

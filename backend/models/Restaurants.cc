@@ -1575,6 +1575,11 @@ Json::Value Restaurants::toJson() const
     return ret;
 }
 
+std::string Restaurants::toString() const
+{
+    return toJson().toStyledString();
+}
+
 Json::Value Restaurants::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
