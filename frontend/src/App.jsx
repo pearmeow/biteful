@@ -16,8 +16,9 @@ import MenuUploader from "./features/menus/components/MenuUploader";
 
 const isAuthenticated = () => {
     if (localStorage.getItem("sessionId") === null) {
-        throw redirect("/login");
+        return redirect("/login");
     }
+    return null;
 };
 
 const router = createBrowserRouter([
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
                 <Dashboard />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/login",
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
                 <Dashboard />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/map/pantry",
@@ -62,7 +63,7 @@ const router = createBrowserRouter([
                 <PantryExplorer />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/ocr",
@@ -71,7 +72,7 @@ const router = createBrowserRouter([
                 <Restaurant />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/profile",
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
                 <Profile />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/:camis/menu",
@@ -89,7 +90,7 @@ const router = createBrowserRouter([
                 <MenuViewer />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/:camis/menu/upload",
@@ -98,7 +99,7 @@ const router = createBrowserRouter([
                 <MenuUploader />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     },
     {
         path: "/map/restaurant",
@@ -107,7 +108,7 @@ const router = createBrowserRouter([
                 <RestaurantExplorer />
             </MainLayout>
         ),
-        middleware: [isAuthenticated],
+        loader: isAuthenticated,
     }
 ]);
 

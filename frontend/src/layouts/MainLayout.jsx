@@ -9,6 +9,7 @@ import "../features/auth/components/auth.css";
 import "../features/pantries/components/pantries.css";
 
 const MainLayout = ({ children }) => {
+    const navigate = useNavigate();
     const location = useLocation();
     const session = localStorage.getItem("sessionId");
     const isAuthenticated = session !== null;
