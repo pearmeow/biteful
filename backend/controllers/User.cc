@@ -1,10 +1,15 @@
 #include "User.h"
-
 #include <drogon/orm/DbClient.h>
-
 #include "../plugins/SodiumPlugin.h"
-
 using namespace drogon;
+
+// valid func
+bool isValidId(const std::string& id) {
+    if (id.empty()) return false;
+    char* end;
+    long val = std::strtol(id.c_str(), &end, 10);
+    return *end == '\0' && val >= 0;
+}
 
 // POST /users
 // create account (fr1.1)
@@ -59,11 +64,8 @@ void User::getOne(const HttpRequestPtr& req,
     char* end;
 
     // validation
-    std::strtol(id.c_str(), &end, 10);
-    if (*end != '\0' || id.empty()) {
-        Json::Value ret;
-        ret["error"] = "Invalid user ID";
-        auto resp = HttpResponse::newHttpJsonResponse(ret);
+    if (!isValidId(id)) {
+        auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k400BadRequest);
         callback(resp);
         return;
@@ -156,6 +158,14 @@ void User::getOne(const HttpRequestPtr& req,
 
 void User::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                      std::string&& id) {
+
+    // validation
+    if (!isValidId(id)) {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+        return;
+    }
     auto json = req->getJsonObject();
     if (!json) {
         auto resp = HttpResponse::newHttpResponse();
@@ -191,6 +201,15 @@ void User::updateOne(const HttpRequestPtr& req, std::function<void(const HttpRes
 
 void User::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                      std::string&& id) {
+
+    // validation
+    if (!isValidId(id)) {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+        return;
+    }
+
     auto dbClient = app().getDbClient();
     dbClient->execSqlAsync(
         "DELETE FROM users WHERE id = $1",
@@ -210,6 +229,15 @@ void User::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpRes
 void User::logFood(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback,
                    std::string&& id) {
+
+    // validation
+    if (!isValidId(id)) {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+        return;
+    }
+    
     auto json = req->getJsonObject();
     if (!json || !json->isMember("food_item_id")) {
         auto resp = HttpResponse::newHttpResponse();
