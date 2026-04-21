@@ -55,7 +55,7 @@ const PantryExplorer = () => {
     const pantryTypes = useMemo(() => {
         return [...new Set(
             processedGroups.flatMap(group => 
-                group.cleanPrograms.map(p => p.type).filter(Boolean)
+                group.cleanPrograms.map(p => p.cleanType).filter(Boolean)
             )
         )].sort();
     }, [processedGroups]);
