@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <fstream>
 
-const bool FAKING = false;
+const bool FAKING = true;
 
 // Add definition of your processing function here
 void Ocr::upload(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
