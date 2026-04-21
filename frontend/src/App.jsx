@@ -8,7 +8,6 @@ import LoginForm from "./features/auth/components/LoginForm";
 import SignupForm from "./features/users/components/SignupForm";
 import Dashboard from "./features/users/components/Dashboard";
 import PantryExplorer from "./features/pantries/components/PantryExplorer";
-import Restaurant from "./features/restaurants/components/Restaurant";
 import RestaurantExplorer from "./features/restaurants/components/RestaurantExplorer";
 import MenuViewer from "./features/menus/components/MenuViewer";
 import MenuUploader from "./features/menus/components/MenuUploader";
@@ -63,15 +62,7 @@ const router = createBrowserRouter([
         ),
         middleware: [isAuthenticated],
     },
-    {
-        path: "/ocr",
-        element: (
-            <MainLayout>
-                <Restaurant />
-            </MainLayout>
-        ),
-        middleware: [isAuthenticated],
-    },
+    // camis = restaurant id
     {
         path: "/:camis/menu",
         element: (
@@ -98,7 +89,7 @@ const router = createBrowserRouter([
             </MainLayout>
         ),
         middleware: [isAuthenticated],
-    }
+    },
 ]);
 
 function App() {

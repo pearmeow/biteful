@@ -1,13 +1,14 @@
 import { useState } from "react";
+import NewMenu from "./NewMenu";
 
-const Restaurant = () => {
+const UploadMenu = ({ restaurantId }) => {
     const [result, setResult] = useState(null);
     const onSubmit = async (e) => {
         e.preventDefault(); // prevents form default submission behavior
         const menu = document.getElementById("menu");
         const file = menu.files[0];
+        // 5 megabytes, but a little smaller
         if (file.size > 5 * 1000000) {
-            // 5 megabytes, but a little smaller
             throw new Error("File too large");
         }
         let data = new FormData();
@@ -51,18 +52,22 @@ const Restaurant = () => {
         console.log("no result");
     }
     return (
-        <form action="POST" onSubmit={onSubmit}>
-            <div className="input-group">
-                <label htmlFor="menu">MENU FILE</label>
-                <div className="input-wrapper">
-                    <span className="input-icon">☺︎</span>{" "}
-                    {/*need a better icon...*/}
-                    <input type="file" id="menu" required />
+        <>
+            <form action="POST" onSubmit={onSubmit}>
+                <div className="input-group">
+                    <label htmlFor="menu">MENU FILE</label>
+                    <div className="input-wrapper">
+                        <span className="input-icon">☺︎</span>{" "}
+                        {/*need a better icon...*/}
+                        <input type="file" id="menu" required />
+                    </div>
                 </div>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
+                <button type="submit">Submit</button>
+            </form>
+            // some form that has all the stuff
+            <NewMenu restaurantId={restaurantId} menuData={result} />
+        </>
     );
 };
 
-export default Restaurant;
+export default UploadMenu;

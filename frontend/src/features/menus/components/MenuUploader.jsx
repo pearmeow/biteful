@@ -1,4 +1,5 @@
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from "react-router-dom";
+import UploadMenu from "./UploadMenu";
 
 const MenuUploader = () => {
     const { camis } = useParams();
@@ -8,7 +9,7 @@ const MenuUploader = () => {
     return (
         <div>
             <div>
-                <h2>{name || 'Upload Menu'}</h2>
+                <h2>{name || "Upload Menu"}</h2>
                 {address && <p>{address}</p>}
                 {phone && <p>{phone}</p>}
                 <Link to={`/${camis}/menu`} state={state}>
@@ -16,7 +17,7 @@ const MenuUploader = () => {
                 </Link>
             </div>
             <div>
-                <p>Upload functionality coming soon</p>
+                <UploadMenu />
             </div>
         </div>
     );
