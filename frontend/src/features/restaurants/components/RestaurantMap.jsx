@@ -1,37 +1,19 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import React from 'react';
+import { Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Link } from 'react-router-dom';
-
-function MapUpdater({ target }) {
-  const map = useMap();
-  useEffect(() => {
-    if (target) {
-      map.flyTo([target.lat, target.lng], 15, { duration: 1.5 });
-    }
-  }, [target, map]);
-  return null;
-}
-
+import BaseMap, { purpleIcon } from '../../common/components/BaseMap'
 
 const RestaurantMap = ({ restaurants = [], target }) => {
   return (
-    <MapContainer
-      center={[40.7128, -74.0060]}
-      zoom={12}
-      className="map-frame"
-      style={{ height: '600px', width: '100%' }} // Backup height
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      <MapUpdater target={target} />
-
+    <BaseMap target={target}>
       {restaurants.map((restaurant) => (
-        <Marker key={restaurant.id} position={[restaurant.latitude, restaurant.longitude]}>
-          <Popup className="rpc-popup">
+        <Marker 
+          key={restaurant.id} 
+          position={[restaurant.latitude, restaurant.longitude]}
+          icon={purpleIcon}
+        >
+        <Popup className="rpc-popup">
             <div className="rpc">
 
               <p className="rpc-name">{restaurant.name}</p>
@@ -75,8 +57,8 @@ const RestaurantMap = ({ restaurants = [], target }) => {
           </Popup>
         </Marker>
       ))}
-    </MapContainer>
+    </BaseMap>
   );
 };
 
-export default RestaurantMap;
+export default React.memo(RestaurantMap);

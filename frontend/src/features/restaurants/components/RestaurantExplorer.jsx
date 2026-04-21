@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRestaurants } from '../hooks/useRestaurants';
 import RestaurantMap from './RestaurantMap';
+import './restaurants.css'
 
 const RestaurantExplorer = () => {
     const { restaurants, loading, error, fetchByZipcode } = useRestaurants();
