@@ -1,0 +1,6 @@
+CREATE TABLE food_logs (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    food_item_id INT REFERENCES food_items(id),
+    logged_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);

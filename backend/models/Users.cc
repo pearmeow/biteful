@@ -17,7 +17,11 @@ const std::string Users::Cols::_id = "\"id\"";
 const std::string Users::Cols::_username = "\"username\"";
 const std::string Users::Cols::_email = "\"email\"";
 const std::string Users::Cols::_password_hash = "\"password_hash\"";
+const std::string Users::Cols::_display_name = "\"display_name\"";
+const std::string Users::Cols::_dietary_preferences = "\"dietary_preferences\"";
+const std::string Users::Cols::_health_score = "\"health_score\"";
 const std::string Users::Cols::_created_at = "\"created_at\"";
+const std::string Users::Cols::_phone = "\"phone\"";
 const std::string Users::primaryKeyName = "id";
 const bool Users::hasPrimaryKey = true;
 const std::string Users::tableName = "\"users\"";
@@ -27,7 +31,11 @@ const std::vector<typename Users::MetaData> Users::metaData_={
 {"username","std::string","text",0,0,0,1},
 {"email","std::string","text",0,0,0,1},
 {"password_hash","std::string","text",0,0,0,1},
-{"created_at","::trantor::Date","timestamp with time zone",0,0,0,0}
+{"display_name","std::string","character varying",100,0,0,0},
+{"dietary_preferences","std::string","text",0,0,0,0},
+{"health_score","int32_t","integer",4,0,0,0},
+{"created_at","::trantor::Date","timestamp with time zone",0,0,0,0},
+{"phone","std::string","character varying",20,0,0,0}
 };
 const std::string &Users::getColumnName(size_t index) noexcept(false)
 {
@@ -54,6 +62,18 @@ Users::Users(const Row &r, const ssize_t indexOffset) noexcept
         {
             passwordHash_=std::make_shared<std::string>(r["password_hash"].as<std::string>());
         }
+        if(!r["display_name"].isNull())
+        {
+            displayName_=std::make_shared<std::string>(r["display_name"].as<std::string>());
+        }
+        if(!r["dietary_preferences"].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(r["dietary_preferences"].as<std::string>());
+        }
+        if(!r["health_score"].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>(r["health_score"].as<int32_t>());
+        }
         if(!r["created_at"].isNull())
         {
             auto timeStr = r["created_at"].as<std::string>();
@@ -76,11 +96,15 @@ Users::Users(const Row &r, const ssize_t indexOffset) noexcept
                 createdAt_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
             }
         }
+        if(!r["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(r["phone"].as<std::string>());
+        }
     }
     else
     {
         size_t offset = (size_t)indexOffset;
-        if(offset + 5 > r.size())
+        if(offset + 9 > r.size())
         {
             LOG_FATAL << "Invalid SQL result for this model";
             return;
@@ -109,6 +133,21 @@ Users::Users(const Row &r, const ssize_t indexOffset) noexcept
         index = offset + 4;
         if(!r[index].isNull())
         {
+            displayName_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 5;
+        if(!r[index].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
+        index = offset + 6;
+        if(!r[index].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>(r[index].as<int32_t>());
+        }
+        index = offset + 7;
+        if(!r[index].isNull())
+        {
             auto timeStr = r[index].as<std::string>();
             struct tm stm;
             memset(&stm,0,sizeof(stm));
@@ -129,13 +168,18 @@ Users::Users(const Row &r, const ssize_t indexOffset) noexcept
                 createdAt_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
             }
         }
+        index = offset + 8;
+        if(!r[index].isNull())
+        {
+            phone_=std::make_shared<std::string>(r[index].as<std::string>());
+        }
     }
 
 }
 
 Users::Users(const Json::Value &pJson, const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 9)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -177,7 +221,31 @@ Users::Users(const Json::Value &pJson, const std::vector<std::string> &pMasquera
         dirtyFlag_[4] = true;
         if(!pJson[pMasqueradingVector[4]].isNull())
         {
-            auto timeStr = pJson[pMasqueradingVector[4]].asString();
+            displayName_=std::make_shared<std::string>(pJson[pMasqueradingVector[4]].asString());
+        }
+    }
+    if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson[pMasqueradingVector[5]].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(pJson[pMasqueradingVector[5]].asString());
+        }
+    }
+    if(!pMasqueradingVector[6].empty() && pJson.isMember(pMasqueradingVector[6]))
+    {
+        dirtyFlag_[6] = true;
+        if(!pJson[pMasqueradingVector[6]].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[6]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[7].empty() && pJson.isMember(pMasqueradingVector[7]))
+    {
+        dirtyFlag_[7] = true;
+        if(!pJson[pMasqueradingVector[7]].isNull())
+        {
+            auto timeStr = pJson[pMasqueradingVector[7]].asString();
             struct tm stm;
             memset(&stm,0,sizeof(stm));
             auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
@@ -196,6 +264,14 @@ Users::Users(const Json::Value &pJson, const std::vector<std::string> &pMasquera
                 }
                 createdAt_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
             }
+        }
+    }
+    if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson[pMasqueradingVector[8]].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson[pMasqueradingVector[8]].asString());
         }
     }
 }
@@ -234,9 +310,33 @@ Users::Users(const Json::Value &pJson) noexcept(false)
             passwordHash_=std::make_shared<std::string>(pJson["password_hash"].asString());
         }
     }
-    if(pJson.isMember("created_at"))
+    if(pJson.isMember("display_name"))
     {
         dirtyFlag_[4]=true;
+        if(!pJson["display_name"].isNull())
+        {
+            displayName_=std::make_shared<std::string>(pJson["display_name"].asString());
+        }
+    }
+    if(pJson.isMember("dietary_preferences"))
+    {
+        dirtyFlag_[5]=true;
+        if(!pJson["dietary_preferences"].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(pJson["dietary_preferences"].asString());
+        }
+    }
+    if(pJson.isMember("health_score"))
+    {
+        dirtyFlag_[6]=true;
+        if(!pJson["health_score"].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>((int32_t)pJson["health_score"].asInt64());
+        }
+    }
+    if(pJson.isMember("created_at"))
+    {
+        dirtyFlag_[7]=true;
         if(!pJson["created_at"].isNull())
         {
             auto timeStr = pJson["created_at"].asString();
@@ -260,12 +360,20 @@ Users::Users(const Json::Value &pJson) noexcept(false)
             }
         }
     }
+    if(pJson.isMember("phone"))
+    {
+        dirtyFlag_[8]=true;
+        if(!pJson["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson["phone"].asString());
+        }
+    }
 }
 
 void Users::updateByMasqueradedJson(const Json::Value &pJson,
                                             const std::vector<std::string> &pMasqueradingVector) noexcept(false)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 9)
     {
         LOG_ERROR << "Bad masquerading vector";
         return;
@@ -306,7 +414,31 @@ void Users::updateByMasqueradedJson(const Json::Value &pJson,
         dirtyFlag_[4] = true;
         if(!pJson[pMasqueradingVector[4]].isNull())
         {
-            auto timeStr = pJson[pMasqueradingVector[4]].asString();
+            displayName_=std::make_shared<std::string>(pJson[pMasqueradingVector[4]].asString());
+        }
+    }
+    if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson[pMasqueradingVector[5]].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(pJson[pMasqueradingVector[5]].asString());
+        }
+    }
+    if(!pMasqueradingVector[6].empty() && pJson.isMember(pMasqueradingVector[6]))
+    {
+        dirtyFlag_[6] = true;
+        if(!pJson[pMasqueradingVector[6]].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>((int32_t)pJson[pMasqueradingVector[6]].asInt64());
+        }
+    }
+    if(!pMasqueradingVector[7].empty() && pJson.isMember(pMasqueradingVector[7]))
+    {
+        dirtyFlag_[7] = true;
+        if(!pJson[pMasqueradingVector[7]].isNull())
+        {
+            auto timeStr = pJson[pMasqueradingVector[7]].asString();
             struct tm stm;
             memset(&stm,0,sizeof(stm));
             auto p = strptime(timeStr.c_str(),"%Y-%m-%d %H:%M:%S",&stm);
@@ -325,6 +457,14 @@ void Users::updateByMasqueradedJson(const Json::Value &pJson,
                 }
                 createdAt_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
             }
+        }
+    }
+    if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson[pMasqueradingVector[8]].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson[pMasqueradingVector[8]].asString());
         }
     }
 }
@@ -362,9 +502,33 @@ void Users::updateByJson(const Json::Value &pJson) noexcept(false)
             passwordHash_=std::make_shared<std::string>(pJson["password_hash"].asString());
         }
     }
-    if(pJson.isMember("created_at"))
+    if(pJson.isMember("display_name"))
     {
         dirtyFlag_[4] = true;
+        if(!pJson["display_name"].isNull())
+        {
+            displayName_=std::make_shared<std::string>(pJson["display_name"].asString());
+        }
+    }
+    if(pJson.isMember("dietary_preferences"))
+    {
+        dirtyFlag_[5] = true;
+        if(!pJson["dietary_preferences"].isNull())
+        {
+            dietaryPreferences_=std::make_shared<std::string>(pJson["dietary_preferences"].asString());
+        }
+    }
+    if(pJson.isMember("health_score"))
+    {
+        dirtyFlag_[6] = true;
+        if(!pJson["health_score"].isNull())
+        {
+            healthScore_=std::make_shared<int32_t>((int32_t)pJson["health_score"].asInt64());
+        }
+    }
+    if(pJson.isMember("created_at"))
+    {
+        dirtyFlag_[7] = true;
         if(!pJson["created_at"].isNull())
         {
             auto timeStr = pJson["created_at"].asString();
@@ -386,6 +550,14 @@ void Users::updateByJson(const Json::Value &pJson) noexcept(false)
                 }
                 createdAt_=std::make_shared<::trantor::Date>(t*1000000+decimalNum);
             }
+        }
+    }
+    if(pJson.isMember("phone"))
+    {
+        dirtyFlag_[8] = true;
+        if(!pJson["phone"].isNull())
+        {
+            phone_=std::make_shared<std::string>(pJson["phone"].asString());
         }
     }
 }
@@ -478,6 +650,82 @@ void Users::setPasswordHash(std::string &&pPasswordHash) noexcept
     dirtyFlag_[3] = true;
 }
 
+const std::string &Users::getValueOfDisplayName() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(displayName_)
+        return *displayName_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &Users::getDisplayName() const noexcept
+{
+    return displayName_;
+}
+void Users::setDisplayName(const std::string &pDisplayName) noexcept
+{
+    displayName_ = std::make_shared<std::string>(pDisplayName);
+    dirtyFlag_[4] = true;
+}
+void Users::setDisplayName(std::string &&pDisplayName) noexcept
+{
+    displayName_ = std::make_shared<std::string>(std::move(pDisplayName));
+    dirtyFlag_[4] = true;
+}
+void Users::setDisplayNameToNull() noexcept
+{
+    displayName_.reset();
+    dirtyFlag_[4] = true;
+}
+
+const std::string &Users::getValueOfDietaryPreferences() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(dietaryPreferences_)
+        return *dietaryPreferences_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &Users::getDietaryPreferences() const noexcept
+{
+    return dietaryPreferences_;
+}
+void Users::setDietaryPreferences(const std::string &pDietaryPreferences) noexcept
+{
+    dietaryPreferences_ = std::make_shared<std::string>(pDietaryPreferences);
+    dirtyFlag_[5] = true;
+}
+void Users::setDietaryPreferences(std::string &&pDietaryPreferences) noexcept
+{
+    dietaryPreferences_ = std::make_shared<std::string>(std::move(pDietaryPreferences));
+    dirtyFlag_[5] = true;
+}
+void Users::setDietaryPreferencesToNull() noexcept
+{
+    dietaryPreferences_.reset();
+    dirtyFlag_[5] = true;
+}
+
+const int32_t &Users::getValueOfHealthScore() const noexcept
+{
+    static const int32_t defaultValue = int32_t();
+    if(healthScore_)
+        return *healthScore_;
+    return defaultValue;
+}
+const std::shared_ptr<int32_t> &Users::getHealthScore() const noexcept
+{
+    return healthScore_;
+}
+void Users::setHealthScore(const int32_t &pHealthScore) noexcept
+{
+    healthScore_ = std::make_shared<int32_t>(pHealthScore);
+    dirtyFlag_[6] = true;
+}
+void Users::setHealthScoreToNull() noexcept
+{
+    healthScore_.reset();
+    dirtyFlag_[6] = true;
+}
+
 const ::trantor::Date &Users::getValueOfCreatedAt() const noexcept
 {
     static const ::trantor::Date defaultValue = ::trantor::Date();
@@ -492,12 +740,39 @@ const std::shared_ptr<::trantor::Date> &Users::getCreatedAt() const noexcept
 void Users::setCreatedAt(const ::trantor::Date &pCreatedAt) noexcept
 {
     createdAt_ = std::make_shared<::trantor::Date>(pCreatedAt);
-    dirtyFlag_[4] = true;
+    dirtyFlag_[7] = true;
 }
 void Users::setCreatedAtToNull() noexcept
 {
     createdAt_.reset();
-    dirtyFlag_[4] = true;
+    dirtyFlag_[7] = true;
+}
+
+const std::string &Users::getValueOfPhone() const noexcept
+{
+    static const std::string defaultValue = std::string();
+    if(phone_)
+        return *phone_;
+    return defaultValue;
+}
+const std::shared_ptr<std::string> &Users::getPhone() const noexcept
+{
+    return phone_;
+}
+void Users::setPhone(const std::string &pPhone) noexcept
+{
+    phone_ = std::make_shared<std::string>(pPhone);
+    dirtyFlag_[8] = true;
+}
+void Users::setPhone(std::string &&pPhone) noexcept
+{
+    phone_ = std::make_shared<std::string>(std::move(pPhone));
+    dirtyFlag_[8] = true;
+}
+void Users::setPhoneToNull() noexcept
+{
+    phone_.reset();
+    dirtyFlag_[8] = true;
 }
 
 void Users::updateId(const uint64_t id)
@@ -510,7 +785,11 @@ const std::vector<std::string> &Users::insertColumns() noexcept
         "username",
         "email",
         "password_hash",
-        "created_at"
+        "display_name",
+        "dietary_preferences",
+        "health_score",
+        "created_at",
+        "phone"
     };
     return inCols;
 }
@@ -552,9 +831,53 @@ void Users::outputArgs(drogon::orm::internal::SqlBinder &binder) const
     }
     if(dirtyFlag_[4])
     {
+        if(getDisplayName())
+        {
+            binder << getValueOfDisplayName();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[5])
+    {
+        if(getDietaryPreferences())
+        {
+            binder << getValueOfDietaryPreferences();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[6])
+    {
+        if(getHealthScore())
+        {
+            binder << getValueOfHealthScore();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[7])
+    {
         if(getCreatedAt())
         {
             binder << getValueOfCreatedAt();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[8])
+    {
+        if(getPhone())
+        {
+            binder << getValueOfPhone();
         }
         else
         {
@@ -581,6 +904,22 @@ const std::vector<std::string> Users::updateColumns() const
     if(dirtyFlag_[4])
     {
         ret.push_back(getColumnName(4));
+    }
+    if(dirtyFlag_[5])
+    {
+        ret.push_back(getColumnName(5));
+    }
+    if(dirtyFlag_[6])
+    {
+        ret.push_back(getColumnName(6));
+    }
+    if(dirtyFlag_[7])
+    {
+        ret.push_back(getColumnName(7));
+    }
+    if(dirtyFlag_[8])
+    {
+        ret.push_back(getColumnName(8));
     }
     return ret;
 }
@@ -622,9 +961,53 @@ void Users::updateArgs(drogon::orm::internal::SqlBinder &binder) const
     }
     if(dirtyFlag_[4])
     {
+        if(getDisplayName())
+        {
+            binder << getValueOfDisplayName();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[5])
+    {
+        if(getDietaryPreferences())
+        {
+            binder << getValueOfDietaryPreferences();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[6])
+    {
+        if(getHealthScore())
+        {
+            binder << getValueOfHealthScore();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[7])
+    {
         if(getCreatedAt())
         {
             binder << getValueOfCreatedAt();
+        }
+        else
+        {
+            binder << nullptr;
+        }
+    }
+    if(dirtyFlag_[8])
+    {
+        if(getPhone())
+        {
+            binder << getValueOfPhone();
         }
         else
         {
@@ -667,6 +1050,30 @@ Json::Value Users::toJson() const
     {
         ret["password_hash"]=Json::Value();
     }
+    if(getDisplayName())
+    {
+        ret["display_name"]=getValueOfDisplayName();
+    }
+    else
+    {
+        ret["display_name"]=Json::Value();
+    }
+    if(getDietaryPreferences())
+    {
+        ret["dietary_preferences"]=getValueOfDietaryPreferences();
+    }
+    else
+    {
+        ret["dietary_preferences"]=Json::Value();
+    }
+    if(getHealthScore())
+    {
+        ret["health_score"]=getValueOfHealthScore();
+    }
+    else
+    {
+        ret["health_score"]=Json::Value();
+    }
     if(getCreatedAt())
     {
         ret["created_at"]=getCreatedAt()->toDbStringLocal();
@@ -674,6 +1081,14 @@ Json::Value Users::toJson() const
     else
     {
         ret["created_at"]=Json::Value();
+    }
+    if(getPhone())
+    {
+        ret["phone"]=getValueOfPhone();
+    }
+    else
+    {
+        ret["phone"]=Json::Value();
     }
     return ret;
 }
@@ -687,7 +1102,7 @@ Json::Value Users::toMasqueradedJson(
     const std::vector<std::string> &pMasqueradingVector) const
 {
     Json::Value ret;
-    if(pMasqueradingVector.size() == 5)
+    if(pMasqueradingVector.size() == 9)
     {
         if(!pMasqueradingVector[0].empty())
         {
@@ -735,13 +1150,57 @@ Json::Value Users::toMasqueradedJson(
         }
         if(!pMasqueradingVector[4].empty())
         {
-            if(getCreatedAt())
+            if(getDisplayName())
             {
-                ret[pMasqueradingVector[4]]=getCreatedAt()->toDbStringLocal();
+                ret[pMasqueradingVector[4]]=getValueOfDisplayName();
             }
             else
             {
                 ret[pMasqueradingVector[4]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[5].empty())
+        {
+            if(getDietaryPreferences())
+            {
+                ret[pMasqueradingVector[5]]=getValueOfDietaryPreferences();
+            }
+            else
+            {
+                ret[pMasqueradingVector[5]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[6].empty())
+        {
+            if(getHealthScore())
+            {
+                ret[pMasqueradingVector[6]]=getValueOfHealthScore();
+            }
+            else
+            {
+                ret[pMasqueradingVector[6]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[7].empty())
+        {
+            if(getCreatedAt())
+            {
+                ret[pMasqueradingVector[7]]=getCreatedAt()->toDbStringLocal();
+            }
+            else
+            {
+                ret[pMasqueradingVector[7]]=Json::Value();
+            }
+        }
+        if(!pMasqueradingVector[8].empty())
+        {
+            if(getPhone())
+            {
+                ret[pMasqueradingVector[8]]=getValueOfPhone();
+            }
+            else
+            {
+                ret[pMasqueradingVector[8]]=Json::Value();
             }
         }
         return ret;
@@ -779,6 +1238,30 @@ Json::Value Users::toMasqueradedJson(
     {
         ret["password_hash"]=Json::Value();
     }
+    if(getDisplayName())
+    {
+        ret["display_name"]=getValueOfDisplayName();
+    }
+    else
+    {
+        ret["display_name"]=Json::Value();
+    }
+    if(getDietaryPreferences())
+    {
+        ret["dietary_preferences"]=getValueOfDietaryPreferences();
+    }
+    else
+    {
+        ret["dietary_preferences"]=Json::Value();
+    }
+    if(getHealthScore())
+    {
+        ret["health_score"]=getValueOfHealthScore();
+    }
+    else
+    {
+        ret["health_score"]=Json::Value();
+    }
     if(getCreatedAt())
     {
         ret["created_at"]=getCreatedAt()->toDbStringLocal();
@@ -786,6 +1269,14 @@ Json::Value Users::toMasqueradedJson(
     else
     {
         ret["created_at"]=Json::Value();
+    }
+    if(getPhone())
+    {
+        ret["phone"]=getValueOfPhone();
+    }
+    else
+    {
+        ret["phone"]=Json::Value();
     }
     return ret;
 }
@@ -827,9 +1318,29 @@ bool Users::validateJsonForCreation(const Json::Value &pJson, std::string &err)
         err="The password_hash column cannot be null";
         return false;
     }
+    if(pJson.isMember("display_name"))
+    {
+        if(!validJsonOfField(4, "display_name", pJson["display_name"], err, true))
+            return false;
+    }
+    if(pJson.isMember("dietary_preferences"))
+    {
+        if(!validJsonOfField(5, "dietary_preferences", pJson["dietary_preferences"], err, true))
+            return false;
+    }
+    if(pJson.isMember("health_score"))
+    {
+        if(!validJsonOfField(6, "health_score", pJson["health_score"], err, true))
+            return false;
+    }
     if(pJson.isMember("created_at"))
     {
-        if(!validJsonOfField(4, "created_at", pJson["created_at"], err, true))
+        if(!validJsonOfField(7, "created_at", pJson["created_at"], err, true))
+            return false;
+    }
+    if(pJson.isMember("phone"))
+    {
+        if(!validJsonOfField(8, "phone", pJson["phone"], err, true))
             return false;
     }
     return true;
@@ -838,7 +1349,7 @@ bool Users::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                                                const std::vector<std::string> &pMasqueradingVector,
                                                std::string &err)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 9)
     {
         err = "Bad masquerading vector";
         return false;
@@ -899,6 +1410,38 @@ bool Users::validateMasqueradedJsonForCreation(const Json::Value &pJson,
                   return false;
           }
       }
+      if(!pMasqueradingVector[5].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[5]))
+          {
+              if(!validJsonOfField(5, pMasqueradingVector[5], pJson[pMasqueradingVector[5]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[6].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[6]))
+          {
+              if(!validJsonOfField(6, pMasqueradingVector[6], pJson[pMasqueradingVector[6]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[7].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[7]))
+          {
+              if(!validJsonOfField(7, pMasqueradingVector[7], pJson[pMasqueradingVector[7]], err, true))
+                  return false;
+          }
+      }
+      if(!pMasqueradingVector[8].empty())
+      {
+          if(pJson.isMember(pMasqueradingVector[8]))
+          {
+              if(!validJsonOfField(8, pMasqueradingVector[8], pJson[pMasqueradingVector[8]], err, true))
+                  return false;
+          }
+      }
     }
     catch(const Json::LogicError &e)
     {
@@ -934,9 +1477,29 @@ bool Users::validateJsonForUpdate(const Json::Value &pJson, std::string &err)
         if(!validJsonOfField(3, "password_hash", pJson["password_hash"], err, false))
             return false;
     }
+    if(pJson.isMember("display_name"))
+    {
+        if(!validJsonOfField(4, "display_name", pJson["display_name"], err, false))
+            return false;
+    }
+    if(pJson.isMember("dietary_preferences"))
+    {
+        if(!validJsonOfField(5, "dietary_preferences", pJson["dietary_preferences"], err, false))
+            return false;
+    }
+    if(pJson.isMember("health_score"))
+    {
+        if(!validJsonOfField(6, "health_score", pJson["health_score"], err, false))
+            return false;
+    }
     if(pJson.isMember("created_at"))
     {
-        if(!validJsonOfField(4, "created_at", pJson["created_at"], err, false))
+        if(!validJsonOfField(7, "created_at", pJson["created_at"], err, false))
+            return false;
+    }
+    if(pJson.isMember("phone"))
+    {
+        if(!validJsonOfField(8, "phone", pJson["phone"], err, false))
             return false;
     }
     return true;
@@ -945,7 +1508,7 @@ bool Users::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
                                              const std::vector<std::string> &pMasqueradingVector,
                                              std::string &err)
 {
-    if(pMasqueradingVector.size() != 5)
+    if(pMasqueradingVector.size() != 9)
     {
         err = "Bad masquerading vector";
         return false;
@@ -979,6 +1542,26 @@ bool Users::validateMasqueradedJsonForUpdate(const Json::Value &pJson,
       if(!pMasqueradingVector[4].empty() && pJson.isMember(pMasqueradingVector[4]))
       {
           if(!validJsonOfField(4, pMasqueradingVector[4], pJson[pMasqueradingVector[4]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[5].empty() && pJson.isMember(pMasqueradingVector[5]))
+      {
+          if(!validJsonOfField(5, pMasqueradingVector[5], pJson[pMasqueradingVector[5]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[6].empty() && pJson.isMember(pMasqueradingVector[6]))
+      {
+          if(!validJsonOfField(6, pMasqueradingVector[6], pJson[pMasqueradingVector[6]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[7].empty() && pJson.isMember(pMasqueradingVector[7]))
+      {
+          if(!validJsonOfField(7, pMasqueradingVector[7], pJson[pMasqueradingVector[7]], err, false))
+              return false;
+      }
+      if(!pMasqueradingVector[8].empty() && pJson.isMember(pMasqueradingVector[8]))
+      {
+          if(!validJsonOfField(8, pMasqueradingVector[8], pJson[pMasqueradingVector[8]], err, false))
               return false;
       }
     }
@@ -1058,6 +1641,66 @@ bool Users::validJsonOfField(size_t index,
             if(!pJson.isString())
             {
                 err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 100)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 100)";
+                return false;
+            }
+            break;
+        case 5:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 6:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isInt())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 7:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            break;
+        case 8:
+            if(pJson.isNull())
+            {
+                return true;
+            }
+            if(!pJson.isString())
+            {
+                err="Type error in the "+fieldName+" field";
+                return false;
+            }
+            if(pJson.isString() && std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+                .from_bytes(pJson.asCString()).size() > 20)
+            {
+                err="String length exceeds limit for the " +
+                    fieldName +
+                    " field (the maximum value is 20)";
                 return false;
             }
             break;
