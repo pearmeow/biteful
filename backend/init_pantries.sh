@@ -60,7 +60,15 @@ SELECT
     meal,
     freq, 
     phone,
-    prog
+    CASE 
+        WHEN TRIM(prog) = 'MP' THEN 'Mobile Pantry'
+        WHEN TRIM(prog) = 'SOUP KITCH' THEN 'Soup Kitchen'
+        WHEN TRIM(prog) = 'PANTRY' THEN 'Pantry'
+        WHEN TRIM(prog) = 'SENIOR' THEN 'Senior'
+        WHEN TRIM(prog) = 'SKM' THEN 'Soup Kitchen Mobile'
+        WHEN TRIM(prog) = 'FB Mobile Pantry' THEN 'Food Bank Mobile Pantry'
+        ELSE TRIM(prog)
+    END
 FROM staging;
 
 -- NORMALIZE PHONE NUMBERS

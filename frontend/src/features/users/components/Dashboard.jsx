@@ -7,12 +7,14 @@ const Dashboard = () => {
     const nav = useNavigate();
     const userId = localStorage.getItem("userId");
 
-    // only runs if we have a userId
-    useEffect(() => {
-        if (!userId) {
+    if (!userId) {
             nav("/login");
             return;
         }
+
+    // only runs if we have a userId
+    useEffect(() => {
+        
 
         userService
             .getProfile(userId)

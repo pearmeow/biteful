@@ -23,7 +23,7 @@ const purpleIcon = new L.Icon({
 });
 
 const DAY_ORDER = {
-  "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, 
+  "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4,
   "Friday": 5, "Saturday": 6, "Sunday": 7
 };
 
@@ -71,8 +71,8 @@ const PantryMap = ({ pantries = [], target }) => {
 
                 <div className="pantry-list-scroll">
                   {Object.entries(groupedPrograms).map(([category, days], idx) => {
-                    const sortedDays = [...days].sort((a, b) => 
-                        (DAY_ORDER[a.day_of_week] || 99) - (DAY_ORDER[b.day_of_week] || 99)
+                    const sortedDays = [...days].sort((a, b) =>
+                      (DAY_ORDER[a.day_of_week] || 99) - (DAY_ORDER[b.day_of_week] || 99)
                     );
 
                     return (

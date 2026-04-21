@@ -9,48 +9,20 @@ import "../features/auth/components/auth.css";
 import "../features/pantries/components/pantries.css";
 
 const MainLayout = ({ children }) => {
-    const navigate = useNavigate();
-    const location = useLocation(); // to know which page we r on
+    const location = useLocation();
+    const session = localStorage.getItem("sessionId");
+    const isAuthenticated = session !== null;
     const isAuthPage = ["/login", "/signup"].includes(location.pathname);
-
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return localStorage.getItem("sessionId") !== null;
-    });
-
-    const userId = localStorage.getItem("userId");
-    useEffect(() => {
-        const session = localStorage.getItem("sessionId");
-        // if no session and not login/signup --> go to login
-        if (!session && !isAuthPage) {
-            setIsAuthenticated(false);
-            navigate("/login");
-        } else {
-            setIsAuthenticated(session !== null);
-        }
-    }, [location.pathname, navigate, isAuthPage]);
-    
-    
-
-    /* for some reason, when i tried it today it didnt work 
-    and it auto defaulted to the dashboard screen and said
-    i was unauthorized to logout? it was working yesterday so 
-    i was a bit confused as to why but it lowk refused to work so
-    that is why it kinda force logouts regardless lololol? */
-
     const handleLogout = async () => {
         try {
-            // Try to tell the server we are leaving
             await auth.logout();
         } catch (err) {
-            // Even if the server rejects us (401), we continue anyway
-            console.warn("Backend logout failed, but clearing local session.");
+            console.warn("Logout failed, cleaning up local storage anyway.");
         }
-        // ALWAYS clear this, regardless of what the backend says
-        localStorage.removeItem("sessionId");
-        localStorage.removeItem("userId");
-        setIsAuthenticated(false);
-        navigate("/login");
+        localStorage.clear();
+        window.location.href = "/login";
     };
+
 
     return (
         <div className="layout-container">

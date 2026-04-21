@@ -9,11 +9,10 @@ const Profile = () => {
     const [error, setError] = useState(null);
    
     const userId = localStorage.getItem("userId");
-    useEffect(() => {
-        if (!userId || userId === "undefined") {
+
+    if (!userId || userId === "undefined") {
             nav("/login", { state: { error: "Please log in to view your profile." } });
         }
-    }, [userId, nav]);
     if (!userId || userId === "undefined") {
         return null;
     }
