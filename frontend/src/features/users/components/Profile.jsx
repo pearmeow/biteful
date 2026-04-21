@@ -1,11 +1,24 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { drogonClient } from '../../../api/client';
+import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
 const Profile = () => {
+    const nav = useNavigate();
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
    
+    const userId = localStorage.getItem("userId");
+    useEffect(() => {
+        if (!userId || userId === "undefined") {
+            nav("/login", { state: { error: "Please log in to view your profile." } });
+        }
+    }, [userId, nav]);
+    if (!userId || userId === "undefined") {
+        return null;
+    }
+
+
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         display_name: '',
@@ -13,15 +26,8 @@ const Profile = () => {
         dietary_preferences: ''
     });
 
-    const rawId = localStorage.getItem("userId");
-    const userId = (rawId === null || rawId === "undefined") ? null : rawId;
-
-    if (!userId && !error) {
-        setError("No user ID found. Please log in again.");
-    }
 
     const fetchUserData = useCallback(() => {
-        if (!userId) return;
 
         drogonClient(`users/${userId}`, { method: "GET", credentials: "include" })
             .then(data => {

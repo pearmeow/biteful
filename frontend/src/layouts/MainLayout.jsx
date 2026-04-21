@@ -11,18 +11,23 @@ import "../features/pantries/components/pantries.css";
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation(); // to know which page we r on
+    const isAuthPage = ["/login", "/signup"].includes(location.pathname);
+
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         return localStorage.getItem("sessionId") !== null;
     });
-    const [userId, setUserId] = useState(() => {
-        return localStorage.getItem("userId");
-    });
 
+    const userId = localStorage.getItem("userId");
     useEffect(() => {
         const session = localStorage.getItem("sessionId");
-        setIsAuthenticated(session !== null);
-        setUserId(localStorage.getItem("userId"));
-    }, [location.pathname]);
+        // if no session and not login/signup --> go to login
+        if (!session && !isAuthPage) {
+            setIsAuthenticated(false);
+            navigate("/login");
+        } else {
+            setIsAuthenticated(session !== null);
+        }
+    }, [location.pathname, navigate, isAuthPage]);
     
     
 
@@ -47,7 +52,6 @@ const MainLayout = ({ children }) => {
         navigate("/login");
     };
 
-    const isAuthPage = ["/login", "/signup"].includes(location.pathname);
     return (
         <div className="layout-container">
             {!isAuthPage && (
@@ -62,13 +66,8 @@ const MainLayout = ({ children }) => {
                         </AuthFormSide>
                     </>
                 ) : (
-                    // pass userId into children via cloneElement
                     <div className="standard-view">
-                        {React.Children.map(children, child =>
-                            React.isValidElement(child)
-                                ? React.cloneElement(child, { userId })
-                                : child
-                        )}
+                        {children}
                     </div>
                 )}
             </main>

@@ -2,28 +2,25 @@ import { useEffect, useState } from "react";
 import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({ userId }) => {
+const Dashboard = () => {
     const [user, setUser] = useState(null);
     const nav = useNavigate();
-
-    // redirect to login if id is missing
-    useEffect(() => {
-        if (!userId) {
-            nav("/login");
-        }
-    }, [userId, nav]);
+    const userId = localStorage.getItem("userId");
 
     // only runs if we have a userId
     useEffect(() => {
-        if (userId) {
-            userService
-                .getProfile(userId)
-                .then((data) => setUser(data))
-                .catch((err) => {
-                    console.error("Failed to load profile:", err);
-                });
+        if (!userId) {
+            nav("/login");
+            return;
         }
-    }, [userId]);
+
+        userService
+            .getProfile(userId)
+            .then((data) => setUser(data))
+            .catch((err) => {
+                console.error("Failed to load profile:", err);
+            });
+    }, [userId, nav]);
 
     // apparently makes sure it doesnt show that its working b4 switching out (ui flickering)
     if (!userId) {
