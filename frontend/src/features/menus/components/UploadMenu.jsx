@@ -64,8 +64,10 @@ const UploadMenu = ({ restaurantId }) => {
                 </div>
                 <button type="submit">Submit</button>
             </form>
-            // some form that has all the stuff
-            <NewMenu restaurantId={restaurantId} menuData={result} />
+            {/* some form that has all the stuff*/}
+            {result && (
+                <NewMenu restaurantId={restaurantId} menuData={result} />
+            )}
         </>
     );
 };
