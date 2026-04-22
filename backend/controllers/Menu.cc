@@ -13,6 +13,7 @@
 #include <drogon/orm/DbClient.h>
 #include <drogon/orm/Result.h>
 #include <drogon/utils/Utilities.h>
+#include <json/reader.h>
 #include <json/value.h>
 #include <json/writer.h>
 #include <trantor/utils/Logger.h>
@@ -25,15 +26,15 @@ void Menu::getOne(const HttpRequestPtr& req, std::function<void(const HttpRespon
                   std::string&& id) {
     // basic error checking
     char* errPtr;
-    int cleanedId = std::strtol(id.c_str(), &errPtr, 10);
+    int intId = std::strtol(id.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (cleanedId < 0 || *errPtr != '\0') {
+    if (intId < 0 || *errPtr != '\0' || id.empty()) {
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
     auto dbClient = app().getDbClient();
     try {
-        auto result = dbClient->execSqlSync("SELECT * FROM menus WHERE id = $1", cleanedId);
+        auto result = dbClient->execSqlSync("SELECT * FROM menus WHERE id = $1", id);
         if (result.empty()) {
             callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
             return;
@@ -68,22 +69,28 @@ void Menu::get(const HttpRequestPtr& req, std::function<void(const HttpResponseP
         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
     }
 }
+
 void Menu::create(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
-    std::string restaurantId = req->getParameter("restaurantId");
+    Json::Value body;
+    Json::Reader reader;
+    reader.parse(req->getBody().data(), body, false);
+    std::string restaurantId(body["restaurantId"].asString());
+    LOG_INFO << "the id is " << restaurantId;
     char* restaurantErrPtr;
-    int cleanedRestaurantId = std::strtol(restaurantId.c_str(), &restaurantErrPtr, 10);
+    int intRestaurantId = std::strtol(restaurantId.c_str(), &restaurantErrPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (cleanedRestaurantId < 0 || *restaurantErrPtr != '\0') {
+    if (intRestaurantId < 0 || *restaurantErrPtr != '\0' || restaurantId.empty()) {
         // restaurant id is wrong
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
     // never trust the user...
     std::string userId = req->session()->get<std::string>("userId");
+    LOG_INFO << "userId is " << userId;
     char* errPtr;
-    int cleanedUserId = std::strtol(userId.c_str(), &errPtr, 10);
+    int intUserId = std::strtol(userId.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (cleanedUserId < 0 || *errPtr != '\0') {
+    if (intUserId < 0 || *errPtr != '\0' || userId.empty()) {
         // this one is internal server error because somehow the id from the session was invalid...
         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
         return;
@@ -91,35 +98,37 @@ void Menu::create(const HttpRequestPtr& req, std::function<void(const HttpRespon
     auto dbClient = app().getDbClient();
     try {
         auto result = dbClient->execSqlSync("INSERT INTO menus (restaurant_id, user_id) VALUES ($1, $2)",
-                                            restaurantId, cleanedUserId);
+                                            restaurantId, userId);
         // return the inserted menu for debugging
         drogon::orm::Row row = result.front();
         Json::Value menuInfo;
         // set the values in the return json
+        LOG_INFO << "before inserting json";
         for (const drogon::orm::Field& field : row) {
             menuInfo[field.name()] = field.c_str();
+            LOG_INFO << field.name() << " " << field.c_str();
         }
         callback(HttpResponse::newHttpJsonResponse(menuInfo));
     } catch (std::exception& e) {
         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
     }
 }
+
 void Menu::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                      std::string&& id) {
     // this means that the rating has gone up or down by one because a user clicked up or down
     char* errPtr;
-    int cleanedId = std::strtol(id.c_str(), &errPtr, 10);
+    int intId = std::strtol(id.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (cleanedId < 0 || *errPtr != '\0') {
+    if (intId < 0 || *errPtr != '\0' || id.empty()) {
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
     bool isUpvote = req->getParameter("up").empty();
     auto dbClient = app().getDbClient();
-    int change = isUpvote ? 1 : -1;
+    std::string change = isUpvote ? "1" : "-1";
     try {
-        auto result =
-            dbClient->execSqlSync("UPDATE menus SET rating = rating + $1 WHERE id = $2", change, cleanedId);
+        auto result = dbClient->execSqlSync("UPDATE menus SET rating = rating + $1 WHERE id = $2", change, id);
         drogon::orm::Row row = result.front();
         Json::Value menuInfo;
         // set the values in the return json
@@ -142,15 +151,15 @@ void Menu::update(const HttpRequestPtr &req,
 void Menu::deleteOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                      std::string&& id) {
     char* errPtr;
-    int cleanedId = std::strtol(id.c_str(), &errPtr, 10);
+    int intId = std::strtol(id.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (cleanedId < 0 || *errPtr != '\0') {
+    if (intId < 0 || *errPtr != '\0' || id.empty()) {
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
     auto dbClient = app().getDbClient();
     try {
-        auto result = dbClient->execSqlSync("DELETE FROM menus WHERE id = $1", cleanedId);
+        auto result = dbClient->execSqlSync("DELETE FROM menus WHERE id = $1", id);
         drogon::orm::Row row = result.front();
         Json::Value menuInfo;
         // set the values in the return json
