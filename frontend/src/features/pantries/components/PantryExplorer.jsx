@@ -1,9 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useDeferredValue, useState, useMemo } from 'react';
 import { usePantries } from '../hooks/usePantries';
 import PantryMap from './PantryMap';
-import { useLocationSearch, extractZipCode } from '../../common/useLocationSearch'
+import { useLocationSearch } from '../../common/useLocationSearch'
 import ZipSearchInput from '../../common/components/ZipSearchInput';
+import { calculateLinearDistance, formatDistance } from '../../common/utils/locationUtils';
+import '../../common/components/explorer.css';
 import './pantries.css';
+
+const DIRECT_PIN_RENDER_THRESHOLD = 600;
+const DEFERRED_CLUSTER_RENDER_THRESHOLD = 2000;
 
 const DAYS_OF_WEEK = [
     'Monday',
@@ -20,6 +25,9 @@ const PantryExplorer = () => {
     const [mapTarget, setMapTarget] = useState(null);
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedTypes, setSelectedTypes] = useState([]);
+    const [userCoords, setUserCoords] = useState(null);
+    const [sortByProximity, setSortByProximity] = useState(false);
+    const [selectedPantryId, setSelectedPantryId] = useState(null);
 
     const { 
         inputRef, 
@@ -29,21 +37,34 @@ const PantryExplorer = () => {
         geoLoading, 
         handleZipChange, 
         handleMyLocation, 
-        resetZip
+        resetZip,
+        commitZip
 
-    } = useLocationSearch((coords) => setMapTarget(coords));
+    } = useLocationSearch((coords) => {
+        setMapTarget(coords);
+        setUserCoords(coords);
+    });
 
     const processedGroups = useMemo(() => {
         return (groups || []).map(group => {
-            // Extract ZIP once per group
-            const zip = extractZipCode(group.address);
-            
+            // addr1, addr2, addr3 usually form the street/city portion
+            const streetAddress = [
+                group.building, // addr1
+                group.street,   // addr2
+                group.boro      // addr3
+            ].filter(Boolean).join(', ');
+
+            const fullAddress = streetAddress 
+                ? `${streetAddress} ${group.zipcode || ''}`.trim()
+                : (group.zipcode || '');
+
             return {
                 ...group,
-                extractedZip: zip,
+                fullAddress, 
+                zipcode: group.zipcode ? String(group.zipcode).trim() : '',
                 cleanPrograms: (group.programs || []).map(p => ({
                     ...p,
-                    cleanType: p.program?.trim() || '',
+                    cleanType: (p.program || '').trim(),
                     day: p.day_of_week
                 }))
             };
@@ -55,7 +76,7 @@ const PantryExplorer = () => {
     const pantryTypes = useMemo(() => {
         return [...new Set(
             processedGroups.flatMap(group => 
-                group.cleanPrograms.map(p => p.type).filter(Boolean)
+                group.cleanPrograms.map(p => p.cleanType).filter(Boolean)
             )
         )].sort();
     }, [processedGroups]);
@@ -73,7 +94,7 @@ const PantryExplorer = () => {
     const filteredGroups = useMemo(() => {
         return processedGroups.filter((group) => {
             if (committedZip.length === 5) {
-                if (group.extractedZip !== committedZip) return false;
+                if (group.zipcode !== committedZip) return false;
             }
 
             if (selectedDays.length > 0) {
@@ -94,6 +115,43 @@ const PantryExplorer = () => {
         });
     }, [processedGroups, committedZip, selectedDays, selectedTypes]);
 
+    const sortedGroups = useMemo(() => {
+        const groupsWithDistance = filteredGroups.map((group) => ({
+            ...group,
+            distance: calculateLinearDistance(
+                userCoords,
+                { lat: group.latitude, lng: group.longitude },
+                'miles'
+            ),
+        }));
+
+        if (!sortByProximity || !userCoords) {
+            return groupsWithDistance;
+        }
+
+        return [...groupsWithDistance].sort((a, b) => {
+            if (a.distance == null && b.distance == null) return 0;
+            if (a.distance == null) return 1;
+            if (b.distance == null) return -1;
+            return a.distance - b.distance;
+        });
+    }, [filteredGroups, sortByProximity, userCoords]);
+
+    const selectedPantry = useMemo(
+        () => sortedGroups.find((group) => group.id === selectedPantryId) || null,
+        [selectedPantryId, sortedGroups]
+    );
+
+    const deferredFilteredGroups = useDeferredValue(sortedGroups);
+    const visibleGroups = useMemo(() => {
+        if (sortedGroups.length <= DEFERRED_CLUSTER_RENDER_THRESHOLD) {
+            return sortedGroups;
+        }
+
+        return deferredFilteredGroups;
+    }, [deferredFilteredGroups, sortedGroups]);
+    const shouldClusterPins = visibleGroups.length > DIRECT_PIN_RENDER_THRESHOLD;
+
     const handleSearch = () => {
         const currentZip = inputRef.current?.value || "";
 
@@ -103,7 +161,8 @@ const PantryExplorer = () => {
         }
 
         setZipError("");
-        const match = processedGroups.find((group) => group.extractedZip === currentZip);
+        commitZip(currentZip);
+        const match = processedGroups.find((group) => group.zipcode === currentZip);
 
         if (match) {
             setMapTarget({ lat: match.latitude, lng: match.longitude });
@@ -116,7 +175,30 @@ const PantryExplorer = () => {
         resetZip();
         setSelectedDays([]);
         setSelectedTypes([]);
+        setSortByProximity(false);
+        setUserCoords(null);
+        setSelectedPantryId(null);
         setMapTarget(null);
+    };
+
+    const handleSelectPantry = (group) => {
+        setSelectedPantryId(group.id);
+        setMapTarget({
+            lat: Number(group.latitude),
+            lng: Number(group.longitude),
+        });
+    };
+
+    const handleSortByProximity = async () => {
+        if (userCoords) {
+            setSortByProximity((current) => !current);
+            return;
+        }
+
+        const coords = await handleMyLocation();
+        if (coords) {
+            setSortByProximity(true);
+        }
     };
 
     // If loading, show a message instead of the map
@@ -173,8 +255,16 @@ const PantryExplorer = () => {
 
                     <div className="pantry-filter-footer">
                         <span className="pantry-results-count">
-                            Showing {filteredGroups.length} {filteredGroups.length === 1 ? 'pantry' : 'pantries'}
+                            Showing {sortedGroups.length} {sortedGroups.length === 1 ? 'pantry' : 'pantries'}
                         </span>
+                        <button
+                            type="button"
+                            className={`proximity-sort-button ${sortByProximity ? 'is-active' : ''}`}
+                            onClick={handleSortByProximity}
+                            disabled={geoLoading}
+                        >
+                            {geoLoading && !userCoords ? 'Finding location...' : 'Sort by proximity'}
+                        </button>
                         <button
                             type="button"
                             className="pantry-clear-filters"
@@ -186,8 +276,43 @@ const PantryExplorer = () => {
                 </div>
             </div>
 
+            <div className="results-list-panel">
+                {sortedGroups.map((group) => (
+                    <button
+                        key={group.id}
+                        type="button"
+                        className={`location-list-card ${selectedPantryId === group.id ? 'is-selected' : ''}`}
+                        onClick={() => handleSelectPantry(group)}
+                    >
+                        <div className="location-list-heading">
+                            <div className="location-list-title-group">
+                                <h3 className="location-list-name">{group.agency}</h3>
+                                <div className="location-list-inline-meta">
+                                    {[...new Set(group.cleanPrograms.map((program) => program.cleanType).filter(Boolean))]
+                                        .slice(0, 3)
+                                        .map((type) => (
+                                            <span key={type}>{type}</span>
+                                        ))}
+                                </div>
+                            </div>
+                            {group.distance != null && (
+                                <span className="distance-badge">{formatDistance(group.distance, 'miles')}</span>
+                            )}
+                        </div>
+                        <p className="location-list-address">{group.fullAddress || 'Address unavailable'}</p>
+                    </button>
+                ))}
+            </div>
+
             <div className="map-frame">
-                {!loading && <PantryMap pantries={filteredGroups} target={mapTarget} />}
+                {!loading && (
+                    <PantryMap
+                        pantries={visibleGroups}
+                        selectedPantry={selectedPantry}
+                        shouldClusterPins={shouldClusterPins}
+                        target={mapTarget}
+                    />
+                )}
             </div>
         </div>
     );

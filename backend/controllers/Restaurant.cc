@@ -67,7 +67,8 @@ void Restaurant::getAllRestaurants(const HttpRequestPtr& req,
 
     } catch (const DrogonDbException& e) {
         LOG_ERROR << "DB Error: " << e.base().what();
-        auto resp = HttpResponse::newNotFoundResponse();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k500InternalServerError);
         callback(resp);
     }
 }

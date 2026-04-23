@@ -1,82 +1,125 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import BaseMap, { SelectableMarkerLayers } from '../../common/components/BaseMap';
+import { purpleIcon } from '../../common/utils/mapPins';
 import 'leaflet/dist/leaflet.css';
-import { Link } from 'react-router-dom';
 
-function MapUpdater({ target }) {
-  const map = useMap();
-  useEffect(() => {
-    if (target) {
-      map.flyTo([target.lat, target.lng], 15, { duration: 1.5 });
+const buildPopupContent = (restaurant, onNavigate) => {
+    const container = document.createElement('div');
+    container.className = 'rpc';
+
+    const title = document.createElement('h3');
+    title.className = 'rpc-name';
+    title.textContent = restaurant.name || 'Unknown Restaurant';
+    container.appendChild(title);
+
+    if (restaurant.phone) {
+        const phoneLink = document.createElement('a');
+        phoneLink.href = `tel:${restaurant.phone.replace(/\D/g, '')}`;
+        phoneLink.className = 'rpc-phone';
+        phoneLink.textContent = restaurant.phone;
+        container.appendChild(phoneLink);
     }
-  }, [target, map]);
-  return null;
-}
 
+    if (restaurant.address) {
+        const addressLink = document.createElement('a');
+        addressLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`;
+        addressLink.target = '_blank';
+        addressLink.rel = 'noopener noreferrer';
+        addressLink.className = 'rpc-address';
+        addressLink.title = 'Open in Maps';
+        addressLink.textContent = restaurant.address;
+        container.appendChild(addressLink);
+    }
 
-const RestaurantMap = ({ restaurants = [], target }) => {
-  return (
-    <MapContainer
-      center={[40.7128, -74.0060]}
-      zoom={12}
-      className="map-frame"
-      style={{ height: '600px', width: '100%' }} // Backup height
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    if (restaurant.cuisine || restaurant.grade) {
+        const meta = document.createElement('div');
+        meta.className = 'rpc-meta';
 
-      <MapUpdater target={target} />
+        if (restaurant.cuisine) {
+            const cuisineGroup = document.createElement('div');
+            cuisineGroup.className = 'rpc-category-group';
 
-      {restaurants.map((restaurant) => (
-        <Marker key={restaurant.id} position={[restaurant.latitude, restaurant.longitude]}>
-          <Popup className="rpc-popup">
-            <div className="rpc">
+            const cuisineLabel = document.createElement('span');
+            cuisineLabel.className = 'rpc-category-label';
+            cuisineLabel.textContent = 'Cuisine:';
 
-              <p className="rpc-name">{restaurant.name}</p>
+            const cuisineValue = document.createElement('span');
+            cuisineValue.className = 'rpc-detail-row';
+            cuisineValue.textContent = restaurant.cuisine;
 
-              <div className="rpc-meta">
-                {restaurant.cuisine && (
-                  <span className="rpc-cuisine">{restaurant.cuisine}</span>
-                )}
-                {restaurant.grade && (
-                  <span className="rpc-grade">Grade: {restaurant.grade}</span>
-                )}
-              </div>
+            cuisineGroup.append(cuisineLabel, cuisineValue);
+            meta.appendChild(cuisineGroup);
+        }
 
-              <Link to={`/${restaurant.id}/menu`} state={{ name: restaurant.name, address: restaurant.address, phone:restaurant.phone }}>
-                View Menu
-              </Link>
-              <Link to={`/${restaurant.id}/menu/upload`} state={{ name: restaurant.name, address: restaurant.address, phone:restaurant.phone }}>
-                Upload Menu
-              </Link>
+        if (restaurant.grade) {
+            const gradeGroup = document.createElement('div');
+            gradeGroup.className = 'rpc-category-group';
 
-              {restaurant.phone && (
-                <div className="rpc-phone">📞 {restaurant.phone}</div>
-              )}
+            const gradeLabel = document.createElement('span');
+            gradeLabel.className = 'rpc-category-label';
+            gradeLabel.textContent = 'Grade:';
 
-              {restaurant.address && (
-                <>
-                  <div className="rpc-divider" />
-                  📍
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rpc-address"
-                    title="Open in Maps"
-                  >
-                    {restaurant.address}
-                  </a>
-                </>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  );
+            const gradeValue = document.createElement('span');
+            gradeValue.className = 'rpc-detail-row';
+            gradeValue.textContent = restaurant.grade;
+
+            gradeGroup.append(gradeLabel, gradeValue);
+            meta.appendChild(gradeGroup);
+        }
+
+        container.appendChild(meta);
+    }
+
+    const links = document.createElement('div');
+    links.className = 'rpc-links';
+
+    const viewMenuLink = document.createElement('button');
+    viewMenuLink.type = 'button';
+    viewMenuLink.className = 'rpc-action-link';
+    viewMenuLink.textContent = 'View Menu';
+    viewMenuLink.dataset.action = 'view-menu';
+
+    const uploadMenuLink = document.createElement('button');
+    uploadMenuLink.type = 'button';
+    uploadMenuLink.className = 'rpc-action-link';
+    uploadMenuLink.textContent = 'Upload Menu';
+    uploadMenuLink.dataset.action = 'upload-menu';
+
+    const state = {
+        name: restaurant.name,
+        address: restaurant.address,
+        phone: restaurant.phone,
+    };
+
+    viewMenuLink.onclick = () => onNavigate(`/${restaurant.id}/menu`, state);
+    uploadMenuLink.onclick = () => onNavigate(`/${restaurant.id}/menu/upload`, state);
+
+    links.append(viewMenuLink, uploadMenuLink);
+    container.appendChild(links);
+
+    return container;
 };
 
-export default RestaurantMap;
+const RestaurantMap = ({ restaurants = [], selectedRestaurant = null, shouldClusterPins = false, target }) => {
+    const navigate = useNavigate();
+    const buildRestaurantPopup = (restaurant) =>
+        buildPopupContent(restaurant, (path, state) => navigate(path, { state }));
+
+    return (
+        <BaseMap target={target}>
+            <SelectableMarkerLayers
+                items={restaurants}
+                selectedItem={selectedRestaurant}
+                shouldClusterPins={shouldClusterPins}
+                getKey={(restaurant) => restaurant.id}
+                getPosition={(restaurant) => [restaurant.latitude, restaurant.longitude]}
+                buildPopupContent={buildRestaurantPopup}
+                popupClassName="rpc-popup"
+                icon={purpleIcon}
+            />
+        </BaseMap>
+    );
+};
+
+export default React.memo(RestaurantMap);

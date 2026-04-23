@@ -50,7 +50,10 @@ SELECT DISTINCT ON (camis::INT)
         WHEN inspection_date LIKE '1900%' OR inspection_date = '' THEN NULL 
         ELSE (inspection_date::TIMESTAMP)::DATE 
     END,
-    NULLIF(TRIM(grade), ''),
+    CASE
+        WHEN TRIM(grade) IN ('', 'N', 'Z') THEN NULL
+        ELSE TRIM(grade)
+    END,
     NULLIF(latitude, '')::DOUBLE PRECISION,
     NULLIF(longitude, '')::DOUBLE PRECISION
 FROM staging_restaurants

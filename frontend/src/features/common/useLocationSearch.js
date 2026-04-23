@@ -1,11 +1,5 @@
-import { useState, useRef, useCallback} from 'react';
-
-const ZIP_CODE_PATTERN = /^\d{5}$/;
-
-export const extractZipCode = (address = '') => {
-    const match = address.trim().match(/\d{5}$/);
-    return match ? match[0] : '';
-};
+import { startTransition, useState, useRef, useCallback} from 'react';
+import { getCoordsFromPosition, getCurrentPosition, normalizeZip } from './utils/locationUtils';
 
 export const useLocationSearch = (onLocationFound) => {
     const inputRef = useRef(null);
@@ -15,34 +9,38 @@ export const useLocationSearch = (onLocationFound) => {
     const [geoLoading, setGeoLoading] = useState(false);
 
     const handleZipChange = (val) => {
-        const cleanZip = val.replace(/\D/g, '').slice(0, 5);
+        const cleanZip = normalizeZip(val);
         if (inputRef.current) inputRef.current.value = cleanZip;
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
-        if (cleanZip.length === 5) {
-            setCommittedZip(cleanZip);
-        } else if (cleanZip.length === 0) {
+        if (cleanZip.length === 0) {
             debounceRef.current = setTimeout(() => setCommittedZip(""), 0);
         }
         
         if (zipError) setZipError("");
     };
 
-    const handleMyLocation = () => {
-        if (!navigator.geolocation) return alert("Geolocation not supported.");
-        
+    const commitZip = useCallback((zip) => {
+        const cleanZip = normalizeZip(zip || "");
+        startTransition(() => {
+            setCommittedZip(cleanZip);
+        });
+    }, []);
+
+    const handleMyLocation = async () => {
         setGeoLoading(true);
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setGeoLoading(false);
-                onLocationFound({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            },
-            () => {
-                setGeoLoading(false);
-                alert("Location access denied.");
-            }
-        );
+        try {
+            const position = await getCurrentPosition();
+            const coords = getCoordsFromPosition(position);
+            onLocationFound(coords);
+            return coords;
+        } catch (error) {
+            alert(error.message === "Geolocation not supported." ? error.message : "Location access denied.");
+            return null;
+        } finally {
+            setGeoLoading(false);
+        }
     };
 
     const resetZip = useCallback(() => {
@@ -54,6 +52,6 @@ export const useLocationSearch = (onLocationFound) => {
     }, []);
 
     return { 
-        inputRef, committedZip, zipError, setZipError, geoLoading, handleZipChange, handleMyLocation, resetZip 
+        inputRef, committedZip, zipError, setZipError, geoLoading, handleZipChange, handleMyLocation, resetZip, commitZip
     };
 };

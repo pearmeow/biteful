@@ -49,7 +49,10 @@ class FoodPantries
         static const std::string _day_of_week;
         static const std::string _open_time;
         static const std::string _close_time;
-        static const std::string _address;
+        static const std::string _street;
+        static const std::string _building;
+        static const std::string _boro;
+        static const std::string _zipcode;
         static const std::string _latitude;
         static const std::string _longitude;
         static const std::string _meal_type;
@@ -153,15 +156,45 @@ class FoodPantries
     void setCloseTime(std::string &&pCloseTime) noexcept;
     void setCloseTimeToNull() noexcept;
 
-    /**  For column address  */
-    ///Get the value of the column address, returns the default value if the column is null
-    const std::string &getValueOfAddress() const noexcept;
+    /**  For column street  */
+    ///Get the value of the column street, returns the default value if the column is null
+    const std::string &getValueOfStreet() const noexcept;
     ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getAddress() const noexcept;
-    ///Set the value of the column address
-    void setAddress(const std::string &pAddress) noexcept;
-    void setAddress(std::string &&pAddress) noexcept;
-    void setAddressToNull() noexcept;
+    const std::shared_ptr<std::string> &getStreet() const noexcept;
+    ///Set the value of the column street
+    void setStreet(const std::string &pStreet) noexcept;
+    void setStreet(std::string &&pStreet) noexcept;
+    void setStreetToNull() noexcept;
+
+    /**  For column building  */
+    ///Get the value of the column building, returns the default value if the column is null
+    const std::string &getValueOfBuilding() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getBuilding() const noexcept;
+    ///Set the value of the column building
+    void setBuilding(const std::string &pBuilding) noexcept;
+    void setBuilding(std::string &&pBuilding) noexcept;
+    void setBuildingToNull() noexcept;
+
+    /**  For column boro  */
+    ///Get the value of the column boro, returns the default value if the column is null
+    const std::string &getValueOfBoro() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getBoro() const noexcept;
+    ///Set the value of the column boro
+    void setBoro(const std::string &pBoro) noexcept;
+    void setBoro(std::string &&pBoro) noexcept;
+    void setBoroToNull() noexcept;
+
+    /**  For column zipcode  */
+    ///Get the value of the column zipcode, returns the default value if the column is null
+    const std::string &getValueOfZipcode() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getZipcode() const noexcept;
+    ///Set the value of the column zipcode
+    void setZipcode(const std::string &pZipcode) noexcept;
+    void setZipcode(std::string &&pZipcode) noexcept;
+    void setZipcodeToNull() noexcept;
 
     /**  For column latitude  */
     ///Get the value of the column latitude, returns the default value if the column is null
@@ -222,7 +255,7 @@ class FoodPantries
     void setProgramToNull() noexcept;
 
 
-    static size_t getColumnNumber() noexcept {  return 12;  }
+    static size_t getColumnNumber() noexcept {  return 15;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -249,7 +282,10 @@ class FoodPantries
     std::shared_ptr<std::string> dayOfWeek_;
     std::shared_ptr<std::string> openTime_;
     std::shared_ptr<std::string> closeTime_;
-    std::shared_ptr<std::string> address_;
+    std::shared_ptr<std::string> street_;
+    std::shared_ptr<std::string> building_;
+    std::shared_ptr<std::string> boro_;
+    std::shared_ptr<std::string> zipcode_;
     std::shared_ptr<double> latitude_;
     std::shared_ptr<double> longitude_;
     std::shared_ptr<std::string> mealType_;
@@ -267,7 +303,7 @@ class FoodPantries
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[12]={ false };
+    bool dirtyFlag_[15]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -309,35 +345,50 @@ class FoodPantries
         }
         if(dirtyFlag_[5])
         {
-            sql += "address,";
+            sql += "street,";
             ++parametersCount;
         }
         if(dirtyFlag_[6])
         {
-            sql += "latitude,";
+            sql += "building,";
             ++parametersCount;
         }
         if(dirtyFlag_[7])
         {
-            sql += "longitude,";
+            sql += "boro,";
             ++parametersCount;
         }
         if(dirtyFlag_[8])
         {
-            sql += "meal_type,";
+            sql += "zipcode,";
             ++parametersCount;
         }
         if(dirtyFlag_[9])
         {
-            sql += "frequency,";
+            sql += "latitude,";
             ++parametersCount;
         }
         if(dirtyFlag_[10])
         {
-            sql += "phone,";
+            sql += "longitude,";
             ++parametersCount;
         }
         if(dirtyFlag_[11])
+        {
+            sql += "meal_type,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[12])
+        {
+            sql += "frequency,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[13])
+        {
+            sql += "phone,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[14])
         {
             sql += "program,";
             ++parametersCount;
@@ -406,6 +457,21 @@ class FoodPantries
             sql.append(placeholderStr, n);
         }
         if(dirtyFlag_[11])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[12])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[13])
+        {
+            n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
+        if(dirtyFlag_[14])
         {
             n = snprintf(placeholderStr,sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);

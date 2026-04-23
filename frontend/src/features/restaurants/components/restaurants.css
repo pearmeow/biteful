@@ -1,110 +1,36 @@
-/* --- Map & Popup --- */
-.restaurant-page-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-self: flex-start;
+.restaurant-map-hint {
+  margin: -8px 0 8px;
+  color: #5f6368;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
-.search-header {
-  display: flex;
-  gap: 10px;
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.restaurant-name-input {
   width: 100%;
   box-sizing: border-box;
-}
-
-.search-header button {
-  width: auto !important;
-  padding: 0 25px !important;
-  white-space: nowrap;
-}
-
-.map-frame {
-  height: 600px;
-  width: 100%;
-  border-radius: 12px;
-  border: 2px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.navbar {
-  z-index: 1000;
-}
-
-/* Restaurant popup card */
-.rpc {
-  padding: 14px 16px;
-  min-width: 220px;
-  max-width: 260px;
-  font-family: inherit;
+  padding: 11px 14px;
+  border: 1px solid #d7d7d7;
+  border-radius: 10px;
   background: #fff;
+  color: #2d0066;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.restaurant-name-input::placeholder {
+  color: #9d96b3;
+}
+
+.restaurant-name-input:focus {
+  outline: none;
+  border-color: #8b3dff;
+  box-shadow: 0 0 0 3px rgba(139, 61, 255, 0.12);
 }
 
 .rpc-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin: 0 0 8px;
-  line-height: 1.35;
-}
-
-.rpc-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.rpc-rating {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #b85c00;
-  background: #fff3e0;
-  padding: 3px 8px;
-  border-radius: 20px;
-}
-
-
-.rpc-count {
-  font-size: 11px;
-  color: #999;
-  font-weight: 400;
-  margin-left: 1px;
-}
-
-.rpc-price {
-  font-size: 12px;
-  font-weight: 600;
-  color: #2e7d32;
-  background: #e8f5e9;
-  padding: 3px 8px;
-  border-radius: 20px;
-}
-
-.rpc-divider {
-  height: 0.5px;
-  background: #eeeeee;
-  margin: 8px 0;
+  margin-bottom: 4px;
 }
 
 .rpc-address {
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
-  color: #666;
-  font-size: 12px;
-  line-height: 1.45;
-  text-decoration: none;
-  transition: color 0.15s;
+  min-width: 0;
 }

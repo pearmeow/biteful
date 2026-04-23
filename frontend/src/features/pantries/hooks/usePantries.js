@@ -26,7 +26,10 @@ export const usePantries = () => {
                         acc[key] = {
                             id: key, // Unique ID for React keys
                             agency: item.agency?.trim() || "Unknown Agency",
-                            address: item.address?.trim() || "",
+                            building: item.building?.trim() || "",
+                            street: item.street?.trim() || "",
+                            boro: item.boro?.trim() || "",
+                            zipcode: item.zipcode?.trim() || "",
                             phone: item.phone?.trim() || "No phone listed",
                             latitude: lat,
                             longitude: lng,

@@ -43,18 +43,16 @@ CREATE TEMP TABLE staging (
 \copy staging FROM '$FILE_NAME' WITH (FORMAT csv, HEADER true, QUOTE '"', ENCODING 'UTF8');
 
 -- Map and clean data into production
-INSERT INTO $TABLE_NAME (agency, day_of_week, open_time, close_time, address, latitude, longitude, meal_type, frequency, phone, program)
+INSERT INTO $TABLE_NAME (agency, day_of_week, open_time, close_time, street, building, boro, zipcode, latitude, longitude, meal_type, frequency, phone, program)
 SELECT 
     agency, 
     dow, 
     to_timestamp(NULLIF(TRIM(open_h), ''), 'HH12:MI AM')::TIME,
     to_timestamp(NULLIF(TRIM(close_h), ''), 'HH12:MI AM')::TIME,
-    CONCAT_WS(', ', 
-        NULLIF(TRIM(addr1), ''), 
-        NULLIF(TRIM(addr2), ''), 
-        NULLIF(TRIM(addr3), ''), 
-        NULLIF(TRIM(addr4), '')
-    ), 
+    NULLIF(TRIM(addr1), ''), 
+    NULLIF(TRIM(addr2), ''), 
+    NULLIF(TRIM(addr3), ''), 
+    NULLIF(TRIM(addr4), ''),
     NULLIF(lat, '')::double precision, 
     NULLIF(lon, '')::double precision,
     meal,
