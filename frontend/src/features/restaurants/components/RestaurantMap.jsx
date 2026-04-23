@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useMap } from 'react-leaflet';
+import { Marker, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet.markercluster';
@@ -123,12 +123,11 @@ const createRestaurantMarker = (restaurant, onNavigate) => {
     return marker;
 };
 
-const RestaurantClusterLayer = ({ restaurants = [], visibleRestaurantIds }) => {
+const RestaurantClusterLayer = ({ restaurants = [] }) => {
     const map = useMap();
     const navigate = useNavigate();
     const clusterGroupRef = useRef(null);
     const markerByIdRef = useRef(new Map());
-    const visibleMarkerIdsRef = useRef(new Set());
 
     const normalizedRestaurants = useMemo(() => {
         return (restaurants || []).filter((restaurant) =>
@@ -173,7 +172,6 @@ const RestaurantClusterLayer = ({ restaurants = [], visibleRestaurantIds }) => {
 
         clusterGroup.clearLayers();
         markerByIdRef.current.clear();
-        visibleMarkerIdsRef.current = new Set();
 
         for (const restaurant of normalizedRestaurants) {
             const marker = createRestaurantMarker(restaurant, (path, state) => {
@@ -182,48 +180,65 @@ const RestaurantClusterLayer = ({ restaurants = [], visibleRestaurantIds }) => {
 
             markerByIdRef.current.set(restaurant.id, marker);
         }
+
+        if (markerByIdRef.current.size > 0) {
+            clusterGroup.addLayers([...markerByIdRef.current.values()]);
+        }
     }, [navigate, normalizedRestaurants]);
-
-    useEffect(() => {
-        const clusterGroup = clusterGroupRef.current;
-        if (!clusterGroup) return;
-
-        const nextVisibleIds = visibleRestaurantIds || new Set();
-        const nextVisibleMarkers = [];
-
-        clusterGroup.clearLayers();
-
-        for (const id of nextVisibleIds) {
-            const marker = markerByIdRef.current.get(id);
-            if (marker) {
-                nextVisibleMarkers.push(marker);
-            }
-        }
-
-        if (nextVisibleMarkers.length > 0) {
-            clusterGroup.addLayers(nextVisibleMarkers);
-        }
-
-        visibleMarkerIdsRef.current = new Set(nextVisibleIds);
-    }, [normalizedRestaurants, visibleRestaurantIds]);
 
     useEffect(() => {
         return () => {
             markerByIdRef.current.clear();
-            visibleMarkerIdsRef.current.clear();
         };
     }, []);
 
     return null;
 };
 
-const RestaurantMap = ({ restaurants = [], visibleRestaurantIds, target }) => {
+const RestaurantMarkerLayer = ({ restaurants = [] }) => {
+    const navigate = useNavigate();
+
+    const normalizedRestaurants = useMemo(() => {
+        return (restaurants || []).filter((restaurant) =>
+            restaurant &&
+            restaurant.id &&
+            restaurant.latitude != null &&
+            restaurant.longitude != null &&
+            !Number.isNaN(Number(restaurant.latitude)) &&
+            !Number.isNaN(Number(restaurant.longitude))
+        );
+    }, [restaurants]);
+
+    return normalizedRestaurants.map((restaurant) => (
+        <Marker
+            key={restaurant.id}
+            position={[Number(restaurant.latitude), Number(restaurant.longitude)]}
+            icon={purpleIcon}
+            eventHandlers={{
+                click: (event) => {
+                    const marker = event.target;
+                    if (!marker.getPopup()) {
+                        marker.bindPopup(
+                            buildPopupContent(restaurant, (path, state) => navigate(path, { state })),
+                            { className: 'rpc-popup' }
+                        );
+                    }
+
+                    marker.openPopup();
+                },
+            }}
+        />
+    ));
+};
+
+const RestaurantMap = ({ restaurants = [], shouldClusterPins = false, target }) => {
     return (
         <BaseMap target={target}>
-            <RestaurantClusterLayer
-                restaurants={restaurants}
-                visibleRestaurantIds={visibleRestaurantIds}
-            />
+            {shouldClusterPins ? (
+                <RestaurantClusterLayer restaurants={restaurants} />
+            ) : (
+                <RestaurantMarkerLayer restaurants={restaurants} />
+            )}
         </BaseMap>
     );
 };

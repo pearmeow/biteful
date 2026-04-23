@@ -112,7 +112,7 @@
 }
 
 .rpc {
-  min-width: 260px;
+  min-width: 300px;
 }
 
 .rpc-address {
@@ -145,6 +145,7 @@
   font-size: 0.9rem;
   color: #2d0066;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .rpc-links {
