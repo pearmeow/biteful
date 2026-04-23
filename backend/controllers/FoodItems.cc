@@ -13,51 +13,51 @@
 #include <cstdlib>
 #include <string>
 
-void FoodItems::getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                       std::string&& id) {
-    char* errPtr;
-    int intId = std::strtol(id.c_str(), &errPtr, 10);
-    // if the id is negative the error pointer doesn't point to the end of the string
-    if (intId < 0 || *errPtr != '\0' || id.empty()) {
-        callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
-        return;
-    }
-    auto dbClient = app().getDbClient();
-    try {
-        auto result = dbClient->execSqlSync("SELECT * FROM food_items WHERE id = $1", id);
-        if (result.empty()) {
-            callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
-            return;
-        }
-        drogon::orm::Row row = result.front();
-        Json::Value menuInfo;
-        // set the values in the return json
-        for (const drogon::orm::Field& field : row) {
-            menuInfo[field.name()] = field.c_str();
-        }
-        callback(HttpResponse::newHttpJsonResponse(menuInfo));
-    } catch (std::exception& e) {
-        callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
-    }
-}
+// void FoodItems::getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+//                        std::string&& id) {
+//     char* errPtr;
+//     int intId = std::strtol(id.c_str(), &errPtr, 10);
+//     // if the id is negative the error pointer doesn't point to the end of the string
+//     if (intId < 0 || *errPtr != '\0' || id.empty()) {
+//         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
+//         return;
+//     }
+//     auto dbClient = app().getDbClient();
+//     try {
+//         auto result = dbClient->execSqlSync("SELECT * FROM food_items WHERE id = $1", id);
+//         if (result.empty()) {
+//             callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
+//             return;
+//         }
+//         drogon::orm::Row row = result.front();
+//         Json::Value menuInfo;
+//         // set the values in the return json
+//         for (const drogon::orm::Field& field : row) {
+//             menuInfo[field.name()] = field.c_str();
+//         }
+//         callback(HttpResponse::newHttpJsonResponse(menuInfo));
+//     } catch (std::exception& e) {
+//         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
+//     }
+// }
 
-// changed this to get while also accepting a menu id
+// changed this to get while also accepting a restaurantId
 void FoodItems::get(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                    const std::string& menuId) {
+                    const std::string& restaurantId) {
     char* errPtr;
-    int intId = std::strtol(menuId.c_str(), &errPtr, 10);
+    int intId = std::strtol(restaurantId.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
-    if (intId < 0 || *errPtr != '\0' || menuId.empty()) {
+    if (intId < 0 || *errPtr != '\0' || restaurantId.empty()) {
+        LOG_INFO << "id is " << restaurantId;
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
     auto dbClient = app().getDbClient();
     try {
-        auto result = dbClient->execSqlSync("SELECT * FROM food_items WHERE menu_id = $1", menuId);
-        if (result.empty()) {
-            callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
-            return;
-        }
+        auto result = dbClient->execSqlSync(
+            "SELECT * FROM food_items JOIN menus ON food_items.menu_id = menus.id WHERE restaurant_id = $1 ORDER "
+            "BY menus.rating DESC",
+            restaurantId);
         Json::Value totalFoodItems;
         // set the values in the return json
         for (const auto& row : result) {
@@ -125,7 +125,8 @@ void FoodItems::create(const HttpRequestPtr& req, std::function<void(const HttpR
 
 void FoodItems::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                           std::string&& id) {
-    // can't update a food item
+    // should check for the health value and ping ai api if it's 0, then update it, and give the user back a health
+    // value
     callback(HttpResponse::newHttpResponse(drogon::k404NotFound, drogon::CT_TEXT_PLAIN));
 }
 

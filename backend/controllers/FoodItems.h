@@ -17,7 +17,7 @@ class FoodItems : public drogon::HttpController<FoodItems> {
 public:
     METHOD_LIST_BEGIN
     // use METHOD_ADD to add your custom processing function here;
-    METHOD_ADD(FoodItems::getOne, "/{1}", Get, Options);
+    // METHOD_ADD(FoodItems::getOne, "/{1}", Get, Options);
     METHOD_ADD(FoodItems::get, "/{1}", Get, Options);
     METHOD_ADD(FoodItems::create, "", Post, Options);
     METHOD_ADD(FoodItems::updateOne, "/{1}", Put, Options);
@@ -25,8 +25,8 @@ public:
     METHOD_ADD(FoodItems::deleteOne, "/{1}", Delete, Options);
     METHOD_LIST_END
 
-    void getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
-                std::string&& id);
+    // void getOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+    //             std::string&& id);
     void updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                    std::string&& id);
     void deleteOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
