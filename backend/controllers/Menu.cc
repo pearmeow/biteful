@@ -86,6 +86,12 @@ void Menu::create(const HttpRequestPtr& req, std::function<void(const HttpRespon
     }
     // never trust the user...
     std::string userId = req->session()->get<std::string>("userId");
+    if (userId.empty()) {
+        LOG_INFO << "you probably restarted the backend and then didn't relogin...";
+        LOG_INFO << "because the userId that I tried to get from session is empty...";
+        callback(HttpResponse::newHttpResponse(drogon::k401Unauthorized, drogon::CT_TEXT_PLAIN));
+        return;
+    }
     LOG_INFO << "userId is " << userId;
     char* errPtr;
     int intUserId = std::strtol(userId.c_str(), &errPtr, 10);
