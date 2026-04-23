@@ -118,6 +118,9 @@ void Menu::create(const HttpRequestPtr& req, std::function<void(const HttpRespon
 
 void Menu::updateOne(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
                      std::string&& id) {
+    Json::Value body;
+    Json::Reader reader;
+    reader.parse(req->getBody().data(), body, false);
     // this means that the rating has gone up or down by one because a user clicked up or down
     char* errPtr;
     int intId = std::strtol(id.c_str(), &errPtr, 10);
@@ -126,7 +129,7 @@ void Menu::updateOne(const HttpRequestPtr& req, std::function<void(const HttpRes
         callback(HttpResponse::newHttpResponse(drogon::k400BadRequest, drogon::CT_TEXT_PLAIN));
         return;
     }
-    bool isUpvote = req->getParameter("up").empty();
+    bool isUpvote = !body["up"].empty();
     auto dbClient = app().getDbClient();
     std::string change = isUpvote ? "1" : "-1";
     try {
