@@ -1,8 +1,8 @@
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import BaseMap, { purpleIcon } from '../../common/components/BaseMap';
+import BaseMap from '../../common/components/BaseMap';
+import { purpleIcon } from '../../common/utils/mapPins';
 
 const DAY_ORDER = {
   "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4,

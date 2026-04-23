@@ -3,7 +3,8 @@ import { Marker, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet.markercluster';
-import BaseMap, { purpleIcon } from '../../common/components/BaseMap';
+import BaseMap from '../../common/components/BaseMap';
+import { purpleIcon } from '../../common/utils/mapPins';
 import 'leaflet/dist/leaflet.css';
 
 const buildPopupContent = (restaurant, onNavigate) => {

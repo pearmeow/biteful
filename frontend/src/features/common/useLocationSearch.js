@@ -1,4 +1,5 @@
 import { startTransition, useState, useRef, useCallback} from 'react';
+import { getCoordsFromPosition, getCurrentPosition, normalizeZip } from './utils/locationUtils';
 
 export const useLocationSearch = (onLocationFound) => {
     const inputRef = useRef(null);
@@ -8,7 +9,7 @@ export const useLocationSearch = (onLocationFound) => {
     const [geoLoading, setGeoLoading] = useState(false);
 
     const handleZipChange = (val) => {
-        const cleanZip = val.replace(/\D/g, '').slice(0, 5);
+        const cleanZip = normalizeZip(val);
         if (inputRef.current) inputRef.current.value = cleanZip;
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -21,27 +22,22 @@ export const useLocationSearch = (onLocationFound) => {
     };
 
     const commitZip = useCallback((zip) => {
-        const cleanZip = (zip || "").replace(/\D/g, '').slice(0, 5);
+        const cleanZip = normalizeZip(zip || "");
         startTransition(() => {
             setCommittedZip(cleanZip);
         });
     }, []);
 
-    const handleMyLocation = () => {
-        if (!navigator.geolocation) return alert("Geolocation not supported.");
-        
+    const handleMyLocation = async () => {
         setGeoLoading(true);
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setGeoLoading(false);
-                onLocationFound({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            },
-            () => {
-                setGeoLoading(false);
-                alert("Location access denied.");
-            }, 
-            { enableHighAccuracy: true }
-        );
+        try {
+            const position = await getCurrentPosition();
+            onLocationFound(getCoordsFromPosition(position));
+        } catch (error) {
+            alert(error.message === "Geolocation not supported." ? error.message : "Location access denied.");
+        } finally {
+            setGeoLoading(false);
+        }
     };
 
     const resetZip = useCallback(() => {
