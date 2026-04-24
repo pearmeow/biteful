@@ -82,7 +82,6 @@ const getAllRestaurantsRaw = async () => {
 };
 
 export const useRestaurants = () => {
-    const abortControllerRef = useRef(null);
     const isMountedRef = useRef(true);
     const [state, setState] = useState({
         restaurants: [],
@@ -95,7 +94,6 @@ export const useRestaurants = () => {
 
         return () => {
             isMountedRef.current = false;
-            abortControllerRef.current?.abort();
         };
     }, []);
 

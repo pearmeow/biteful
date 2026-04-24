@@ -3,12 +3,14 @@ import { usePantries } from '../hooks/usePantries';
 import PantryMap from './PantryMap';
 import { useLocationSearch } from '../../common/useLocationSearch'
 import ZipSearchInput from '../../common/components/ZipSearchInput';
-import { calculateLinearDistance, formatDistance } from '../../common/utils/locationUtils';
+import { formatDistance } from '../../common/utils/locationUtils';
+import { getVisibleClusterItems, sortItemsByDistance, toggleSelectedValue } from '../../common/utils/explorerUtils';
 import '../../common/components/explorer.css';
 import './pantries.css';
 
 const DIRECT_PIN_RENDER_THRESHOLD = 600;
 const DEFERRED_CLUSTER_RENDER_THRESHOLD = 2000;
+const SELECTED_LOCATION_ZOOM = 17;
 
 const DAYS_OF_WEEK = [
     'Monday',
@@ -45,96 +47,51 @@ const PantryExplorer = () => {
         setUserCoords(coords);
     });
 
-    const processedGroups = useMemo(() => {
-        return (groups || []).map(group => {
-            // addr1, addr2, addr3 usually form the street/city portion
-            const streetAddress = [
-                group.building, // addr1
-                group.street,   // addr2
-                group.boro      // addr3
-            ].filter(Boolean).join(', ');
-
-            const fullAddress = streetAddress 
-                ? `${streetAddress} ${group.zipcode || ''}`.trim()
-                : (group.zipcode || '');
-
-            return {
-                ...group,
-                fullAddress, 
-                zipcode: group.zipcode ? String(group.zipcode).trim() : '',
-                cleanPrograms: (group.programs || []).map(p => ({
-                    ...p,
-                    cleanType: (p.program || '').trim(),
-                    day: p.day_of_week
-                }))
-            };
-        });
-    }, [groups]);
-
-    // filter(Boolean) removes falsy values for safety
-    // useMemo to cache data
     const pantryTypes = useMemo(() => {
         return [...new Set(
-            processedGroups.flatMap(group => 
-                group.cleanPrograms.map(p => p.cleanType).filter(Boolean)
+            groups.flatMap((group) =>
+                group.programTypes || []
             )
         )].sort();
-    }, [processedGroups]);
+    }, [groups]);
 
     const toggleSelection = (value, setSelectedValues) => {
-        setSelectedValues((current) =>
-            current.includes(value)
-                ? current.filter((item) => item !== value)
-                : [...current, value]
-        );
+        toggleSelectedValue(value, setSelectedValues);
     };
 
-    // groups is data loaded from backend
-    // a pantry can have multiple programs, programs is an array
     const filteredGroups = useMemo(() => {
-        return processedGroups.filter((group) => {
+        return groups.filter((group) => {
             if (committedZip.length === 5) {
                 if (group.zipcode !== committedZip) return false;
             }
 
             if (selectedDays.length > 0) {
-                const hasDay = group.cleanPrograms.some(p => 
-                    selectedDays.includes(p.day)
+                const hasDay = group.programs.some((program) =>
+                    selectedDays.includes(program.day)
                 );
                 if (!hasDay) return false;
             }
 
             if (selectedTypes.length > 0) {
-                const hasType = group.cleanPrograms.some(p => 
-                    selectedTypes.includes(p.cleanType)
+                const hasType = group.programs.some((program) =>
+                    selectedTypes.includes(program.cleanType)
                 );
                 if (!hasType) return false;
             }
 
             return true;
         });
-    }, [processedGroups, committedZip, selectedDays, selectedTypes]);
+    }, [committedZip, groups, selectedDays, selectedTypes]);
 
     const sortedGroups = useMemo(() => {
-        const groupsWithDistance = filteredGroups.map((group) => ({
-            ...group,
-            distance: calculateLinearDistance(
-                userCoords,
-                { lat: group.latitude, lng: group.longitude },
-                'miles'
-            ),
-        }));
+        const groupsWithDistance = sortItemsByDistance(
+            filteredGroups,
+            userCoords,
+            (group) => ({ lat: group.latitude, lng: group.longitude }),
+            sortByProximity
+        );
 
-        if (!sortByProximity || !userCoords) {
-            return groupsWithDistance;
-        }
-
-        return [...groupsWithDistance].sort((a, b) => {
-            if (a.distance == null && b.distance == null) return 0;
-            if (a.distance == null) return 1;
-            if (b.distance == null) return -1;
-            return a.distance - b.distance;
-        });
+        return groupsWithDistance;
     }, [filteredGroups, sortByProximity, userCoords]);
 
     const selectedPantry = useMemo(
@@ -143,13 +100,10 @@ const PantryExplorer = () => {
     );
 
     const deferredFilteredGroups = useDeferredValue(sortedGroups);
-    const visibleGroups = useMemo(() => {
-        if (sortedGroups.length <= DEFERRED_CLUSTER_RENDER_THRESHOLD) {
-            return sortedGroups;
-        }
-
-        return deferredFilteredGroups;
-    }, [deferredFilteredGroups, sortedGroups]);
+    const visibleGroups = useMemo(
+        () => getVisibleClusterItems(sortedGroups, deferredFilteredGroups, DEFERRED_CLUSTER_RENDER_THRESHOLD),
+        [deferredFilteredGroups, sortedGroups]
+    );
     const shouldClusterPins = visibleGroups.length > DIRECT_PIN_RENDER_THRESHOLD;
 
     const handleSearch = () => {
@@ -162,7 +116,7 @@ const PantryExplorer = () => {
 
         setZipError("");
         commitZip(currentZip);
-        const match = processedGroups.find((group) => group.zipcode === currentZip);
+        const match = groups.find((group) => group.zipcode === currentZip);
 
         if (match) {
             setMapTarget({ lat: match.latitude, lng: match.longitude });
@@ -186,6 +140,7 @@ const PantryExplorer = () => {
         setMapTarget({
             lat: Number(group.latitude),
             lng: Number(group.longitude),
+            zoom: SELECTED_LOCATION_ZOOM,
         });
     };
 
@@ -288,8 +243,7 @@ const PantryExplorer = () => {
                             <div className="location-list-title-group">
                                 <h3 className="location-list-name">{group.agency}</h3>
                                 <div className="location-list-inline-meta">
-                                    {[...new Set(group.cleanPrograms.map((program) => program.cleanType).filter(Boolean))]
-                                        .slice(0, 3)
+                                    {(group.programTypes || []).slice(0, 3)
                                         .map((type) => (
                                             <span key={type}>{type}</span>
                                         ))}

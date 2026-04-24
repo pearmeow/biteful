@@ -1,9 +1,8 @@
-import { startTransition, useState, useRef, useCallback} from 'react';
+import { startTransition, useState, useRef, useCallback } from 'react';
 import { getCoordsFromPosition, getCurrentPosition, normalizeZip } from './utils/locationUtils';
 
 export const useLocationSearch = (onLocationFound) => {
     const inputRef = useRef(null);
-    const debounceRef = useRef(null);
     const [committedZip, setCommittedZip] = useState("");
     const [zipError, setZipError] = useState("");
     const [geoLoading, setGeoLoading] = useState(false);
@@ -12,12 +11,10 @@ export const useLocationSearch = (onLocationFound) => {
         const cleanZip = normalizeZip(val);
         if (inputRef.current) inputRef.current.value = cleanZip;
 
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-
         if (cleanZip.length === 0) {
-            debounceRef.current = setTimeout(() => setCommittedZip(""), 0);
+            setCommittedZip("");
         }
-        
+
         if (zipError) setZipError("");
     };
 

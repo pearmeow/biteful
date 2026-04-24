@@ -8,14 +8,14 @@ function MapUpdater({ target }) {
   const map = useMap();
   useEffect(() => {
     if (target?.lat != null && target?.lng != null) {
-      map.flyTo([target.lat, target.lng], 15, { duration: 1.5 });
+      map.flyTo([target.lat, target.lng], target.zoom ?? 15, { duration: 1.5 });
     }
   }, [target, map]);
   return null;
 }
 
 const DEFAULT_CLUSTER_OPTIONS = {
-  chunkedLoading: true,
+  chunkedLoading: false,
   chunkInterval: 120,
   chunkDelay: 40,
   removeOutsideVisibleBounds: true,
@@ -76,24 +76,7 @@ export const ClusteredMarkerLayer = ({
   );
 
   useEffect(() => {
-    if (clusterGroupRef.current) return;
-
-    const clusterGroup = L.markerClusterGroup(clusterOptions);
-    clusterGroupRef.current = clusterGroup;
-    map.addLayer(clusterGroup);
-
-    return () => {
-      map.removeLayer(clusterGroup);
-      clusterGroupRef.current = null;
-    };
-  }, [clusterOptions, map]);
-
-  useEffect(() => {
-    const clusterGroup = clusterGroupRef.current;
-    if (!clusterGroup) return;
-
-    clusterGroup.clearLayers();
-    if (normalizedItems.length === 0) return;
+    const nextClusterGroup = L.markerClusterGroup(clusterOptions);
 
     const markers = normalizedItems.map((item) => {
       const marker = L.marker(getPosition(item).map(Number), { icon });
@@ -101,8 +84,32 @@ export const ClusteredMarkerLayer = ({
       return marker;
     });
 
-    clusterGroup.addLayers(markers);
-  }, [buildPopupContent, getPosition, icon, normalizedItems, popupClassName]);
+    if (markers.length > 0) {
+      // Build the cluster tree before attaching it to the map so the plugin
+      // cannot continue chunk-processing after React has removed the layer.
+      nextClusterGroup.addLayers(markers);
+    }
+
+    const previousClusterGroup = clusterGroupRef.current;
+    clusterGroupRef.current = nextClusterGroup;
+    map.addLayer(nextClusterGroup);
+
+    if (previousClusterGroup) {
+      previousClusterGroup.clearLayers();
+      map.removeLayer(previousClusterGroup);
+    }
+
+    return () => {
+      nextClusterGroup.clearLayers();
+      if (map.hasLayer(nextClusterGroup)) {
+        map.removeLayer(nextClusterGroup);
+      }
+
+      if (clusterGroupRef.current === nextClusterGroup) {
+        clusterGroupRef.current = null;
+      }
+    };
+  }, [buildPopupContent, clusterOptions, getPosition, icon, map, normalizedItems, popupClassName]);
 
   return null;
 };
@@ -114,6 +121,7 @@ export const MarkerLayer = ({
   buildPopupContent,
   popupClassName,
   icon,
+  shouldOpenPopup = false,
 }) => {
   const normalizedItems = useMemo(
     () => getNormalizedItems(items, getKey, getPosition),
@@ -121,9 +129,47 @@ export const MarkerLayer = ({
   );
 
   return normalizedItems.map((item) => (
-    <Marker
+    <PopupMarker
       key={getKey(item)}
+      item={item}
+      popupKey={getKey(item)}
       position={getPosition(item).map(Number)}
+      buildPopupContent={buildPopupContent}
+      popupClassName={popupClassName}
+      icon={icon}
+      shouldOpenPopup={shouldOpenPopup}
+    />
+  ));
+};
+
+const PopupMarker = ({
+  item,
+  popupKey,
+  position,
+  buildPopupContent,
+  popupClassName,
+  icon,
+  shouldOpenPopup = false,
+}) => {
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    const marker = markerRef.current;
+    if (!marker) return;
+
+    if (!marker.getPopup()) {
+      marker.bindPopup(buildPopupContent(item), { className: popupClassName });
+    }
+
+    if (shouldOpenPopup) {
+      marker.openPopup();
+    }
+  }, [buildPopupContent, item, popupClassName, popupKey, shouldOpenPopup]);
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={position}
       icon={icon}
       eventHandlers={{
         click: (event) => {
@@ -136,7 +182,7 @@ export const MarkerLayer = ({
         },
       }}
     />
-  ));
+  );
 };
 
 export const SelectableMarkerLayers = ({
@@ -187,6 +233,7 @@ export const SelectableMarkerLayers = ({
           buildPopupContent={buildPopupContent}
           popupClassName={popupClassName}
           icon={icon}
+          shouldOpenPopup
         />
       )}
     </>

@@ -43,8 +43,11 @@ const buildPantryPopupContent = (group) => {
   container.appendChild(phoneElement);
 
   const groupedPrograms = (group.programs || []).reduce((acc, program) => {
-    if (!acc[program.program]) acc[program.program] = [];
-    acc[program.program].push(program);
+    const programType = program.cleanType || program.program;
+    if (!programType) return acc;
+
+    if (!acc[programType]) acc[programType] = [];
+    acc[programType].push(program);
     return acc;
   }, {});
 

@@ -7,11 +7,4 @@ export const restaurantService = {
             ...options,
         });
     },
-
-    getByZipcode: async (zipcode, options = {}) => {
-        return await drogonClient(`restaurants?zipcode=${encodeURIComponent(zipcode)}`, {
-            method: "GET",
-            ...options,
-        });
-    },
 };

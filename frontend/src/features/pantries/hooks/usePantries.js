@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import { pantryService } from '../services/pantryService';
 
+const buildFullAddress = (group) => {
+    const streetAddress = [group.building, group.street, group.boro].filter(Boolean).join(', ');
+    return streetAddress
+        ? `${streetAddress} ${group.zipcode || ''}`.trim()
+        : (group.zipcode || '');
+};
+
+const normalizePrograms = (programs = []) =>
+    programs.map((program) => ({
+        ...program,
+        cleanType: (program.program || '').trim(),
+        day: program.day_of_week,
+    }));
+
 export const usePantries = () => {
     const [state, setState] = useState({
         groups: [], // Initialized as empty array to prevent .map() undefined errors
@@ -40,8 +54,19 @@ export const usePantries = () => {
                     return acc;
                 }, {});
 
+                const normalizedGroups = Object.values(grouped).map((group) => {
+                    const programs = normalizePrograms(group.programs);
+
+                    return {
+                        ...group,
+                        fullAddress: buildFullAddress(group),
+                        programs,
+                        programTypes: [...new Set(programs.map((program) => program.cleanType).filter(Boolean))],
+                    };
+                });
+
                 setState({
-                    groups: Object.values(grouped),
+                    groups: normalizedGroups,
                     loading: false,
                     error: null
                 });

@@ -2,7 +2,8 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useRestaurants } from '../hooks/useRestaurants';
 import { useLocationSearch } from '../../common/useLocationSearch';
 import ZipSearchInput from '../../common/components/ZipSearchInput';
-import { calculateLinearDistance, formatDistance } from '../../common/utils/locationUtils';
+import { formatDistance } from '../../common/utils/locationUtils';
+import { getVisibleClusterItems, sortItemsByDistance, toggleSelectedValue } from '../../common/utils/explorerUtils';
 import { CUISINE_GROUP_ORDER, getCuisineGroup } from '../utils/cuisineGroups';
 import '../../common/components/explorer.css';
 import RestaurantMap from './RestaurantMap';
@@ -11,6 +12,7 @@ import './restaurants.css';
 const DIRECT_PIN_RENDER_THRESHOLD = 1200;
 const DEFERRED_CLUSTER_RENDER_THRESHOLD = 4000;
 const RESTAURANT_LIST_PAGE_SIZE = 50;
+const SELECTED_LOCATION_ZOOM = 17;
 const RestaurantExplorer = () => {
     const { 
         restaurants = [], 
@@ -90,11 +92,7 @@ const RestaurantExplorer = () => {
 
     const toggleSelection = (value, setSelectedValues) => {
         setVisibleRestaurantCount(RESTAURANT_LIST_PAGE_SIZE);
-        setSelectedValues((current) =>
-            current.includes(value)
-                ? current.filter((item) => item !== value)
-                : [...current, value]
-        );
+        toggleSelectedValue(value, setSelectedValues);
     };
 
     const handleSearch = () => {
@@ -143,25 +141,14 @@ const RestaurantExplorer = () => {
     }, [committedZip, nameQuery, restaurants, selectedCuisines, selectedGrades]);
 
     const sortedRestaurants = useMemo(() => {
-        const restaurantsWithDistance = filteredRestaurants.map((restaurant) => ({
-            ...restaurant,
-            distance: calculateLinearDistance(
-                userCoords,
-                { lat: restaurant.latitude, lng: restaurant.longitude },
-                'miles'
-            ),
-        }));
+        const restaurantsWithDistance = sortItemsByDistance(
+            filteredRestaurants,
+            userCoords,
+            (restaurant) => ({ lat: restaurant.latitude, lng: restaurant.longitude }),
+            sortByProximity
+        );
 
-        if (!sortByProximity || !userCoords) {
-            return restaurantsWithDistance;
-        }
-
-        return [...restaurantsWithDistance].sort((a, b) => {
-            if (a.distance == null && b.distance == null) return 0;
-            if (a.distance == null) return 1;
-            if (b.distance == null) return -1;
-            return a.distance - b.distance;
-        });
+        return restaurantsWithDistance;
     }, [filteredRestaurants, sortByProximity, userCoords]);
 
     const selectedRestaurant = useMemo(
@@ -177,13 +164,10 @@ const RestaurantExplorer = () => {
     const hasMoreRestaurants = visibleRestaurantList.length < sortedRestaurants.length;
 
     const deferredFilteredRestaurants = useDeferredValue(sortedRestaurants);
-    const visibleRestaurants = useMemo(() => {
-        if (sortedRestaurants.length <= DEFERRED_CLUSTER_RENDER_THRESHOLD) {
-            return sortedRestaurants;
-        }
-
-        return deferredFilteredRestaurants;
-    }, [deferredFilteredRestaurants, sortedRestaurants]);
+    const visibleRestaurants = useMemo(
+        () => getVisibleClusterItems(sortedRestaurants, deferredFilteredRestaurants, DEFERRED_CLUSTER_RENDER_THRESHOLD),
+        [deferredFilteredRestaurants, sortedRestaurants]
+    );
     const shouldClusterPins = visibleRestaurants.length > DIRECT_PIN_RENDER_THRESHOLD;
 
     const clearFilters = () => {
@@ -216,6 +200,7 @@ const RestaurantExplorer = () => {
         setMapTarget({
             lat: Number(restaurant.latitude),
             lng: Number(restaurant.longitude),
+            zoom: SELECTED_LOCATION_ZOOM,
         });
     };
 
