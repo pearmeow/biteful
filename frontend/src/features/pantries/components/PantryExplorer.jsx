@@ -176,35 +176,38 @@ const PantryExplorer = () => {
                 />
 
                 <div className="pantry-filters-panel">
-                    <div className="pantry-filter-group">
-                        <span className="pantry-filter-label">Open Days</span>
-                        <div className="pantry-filter-chip-row pantry-filter-chip-row-days">
-                            {DAYS_OF_WEEK.map((day) => (
-                                <button
-                                    key={day}
-                                    type="button"
-                                    className={`pantry-filter-chip ${selectedDays.includes(day) ? 'is-selected' : ''}`}
-                                    onClick={() => toggleSelection(day, setSelectedDays)}
-                                >
-                                    {day.slice(0, 3)}
-                                </button>
-                            ))}
+                    {/* ── ROW: Open Days + Pantry Types side by side ── */}
+                    <div className="filter-groups-row">
+                        <div className="pantry-filter-group">
+                            <span className="pantry-filter-label">Open Days</span>
+                            <div className="pantry-filter-chip-row pantry-filter-chip-row-days">
+                                {DAYS_OF_WEEK.map((day) => (
+                                    <button
+                                        key={day}
+                                        type="button"
+                                        className={`pantry-filter-chip ${selectedDays.includes(day) ? 'is-selected' : ''}`}
+                                        onClick={() => toggleSelection(day, setSelectedDays)}
+                                    >
+                                        {day.slice(0, 3)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="pantry-filter-group">
-                        <span className="pantry-filter-label">Pantry Types</span>
-                        <div className="pantry-filter-chip-row">
-                            {pantryTypes.map((type) => (
-                                <button
-                                    key={type}
-                                    type="button"
-                                    className={`pantry-filter-chip ${selectedTypes.includes(type) ? 'is-selected' : ''}`}
-                                    onClick={() => toggleSelection(type, setSelectedTypes)}
-                                >
-                                    {type}
-                                </button>
-                            ))}
+                        <div className="pantry-filter-group">
+                            <span className="pantry-filter-label">Pantry Types</span>
+                            <div className="pantry-filter-chip-row">
+                                {pantryTypes.map((type) => (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        className={`pantry-filter-chip ${selectedTypes.includes(type) ? 'is-selected' : ''}`}
+                                        onClick={() => toggleSelection(type, setSelectedTypes)}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 

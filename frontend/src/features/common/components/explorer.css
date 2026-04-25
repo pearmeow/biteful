@@ -110,6 +110,13 @@
 .filter-groups-row .restaurant-filter-group:last-child {
   flex: 1;
 }
+.filter-groups-row .pantry-filter-group:first-child {
+  flex: 2;
+}
+
+.filter-groups-row .pantry-filter-group:last-child {
+  flex: 2;
+}
 
 .restaurant-filters-panel,
 .restaurant-filter-group,
