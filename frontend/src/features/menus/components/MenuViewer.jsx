@@ -1,13 +1,13 @@
 import { useParams, useLocation, Link } from "react-router-dom";
 import { drogonClient } from "../../../api/client.js";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const MenuViewer = () => {
     const { camis } = useParams();
     const { state } = useLocation();
     const { name, address, phone } = state || {};
     const [menus, setMenus] = useState(null);
-    let isLoading = false;
+    const [isLoading, setIsLoading] = useState(true);
 
     const upvote = async (menuId) => {
         await drogonClient("menu/" + menuId, {
@@ -16,23 +16,26 @@ const MenuViewer = () => {
                 up: true,
             }),
         });
-        getMenus();
+        fetchMenus();
     };
 
     const downvote = async (menuId) => {
         await drogonClient("menu/" + menuId, {
             method: "PUT",
         });
-        getMenus();
+        fetchMenus();
     };
 
-    const getMenus = async () => {
-        // submit new items with the new menu
+    const fetchMenus = useCallback(async () => {
+        setIsLoading(true);
+        // fetch all food items for this restaurant
         const restaurantMenus = await drogonClient("foodItems/" + camis);
         console.log("getMenusResp");
         console.log(restaurantMenus);
+
         if (restaurantMenus == null) {
             setMenus([]);
+            setIsLoading(false);
             return;
         }
 
@@ -46,53 +49,85 @@ const MenuViewer = () => {
                 currMenuRating = item.rating;
                 menuId = item.menu_id;
                 currMenu.push(
-                    <div key={currInd} className="menuItem">
-                        <p>Dish Name: {item.dish_name}</p>
-                        <p>
-                            Dish Description:{" "}
+                    <div key={currInd} className="menu-item-card">
+                        <p className="menu-item-name">{item.dish_name}</p>
+                        <p className="menu-item-desc">
                             {item.dish_desc !== "NULL" || "N/A"}
                         </p>
-                        <p>Price: {Number.parseFloat(item.price).toFixed(2)}</p>
-                        <p>Health Points: {item.health_points}</p>
+                        <div className="menu-item-footer">
+                            <span className="menu-item-price">
+                                ${Number.parseFloat(item.price).toFixed(2)}
+                            </span>
+                            <span className="menu-item-hp">
+                                {item.health_points} HP
+                            </span>
+                        </div>
                     </div>,
                 );
                 ++currInd;
             }
             const currMenuId = menuId;
             newMenus.push(
-                <div key={menuId} className="menu">
-                    <p>Menu Rating: {currMenuRating}</p>
-                    <button onClick={() => upvote(currMenuId)}>
-                        Upvote Menu
-                    </button>
-                    <p>
-                        <button onClick={() => downvote(currMenuId)}>
-                            Downvote Menu
-                        </button>
-                    </p>
-                    {currMenu}
+                <div key={menuId} className="menu-card">
+                    <div className="menu-card-header">
+                        <span className="menu-card-rating">
+                            Rating: {currMenuRating}
+                        </span>
+                        <div className="menu-vote-row">
+                            <button
+                                className="menu-vote-btn"
+                                onClick={() => upvote(currMenuId)}
+                            >
+                                ▲ Upvote
+                            </button>
+                            <button
+                                className="menu-vote-btn"
+                                onClick={() => downvote(currMenuId)}
+                            >
+                                ▼ Downvote
+                            </button>
+                        </div>
+                    </div>
+                    <div className="menu-items-grid">
+                        {currMenu}
+                    </div>
                 </div>,
             );
         }
         setMenus(newMenus);
-    };
+        setIsLoading(false);
+    }, [camis]);
 
-    if (menus === null) {
-        getMenus();
-        isLoading = true;
-    }
+    // fetch on mount and whenever camis changes
+    useEffect(() => {
+        fetchMenus();
+    }, [fetchMenus]);
 
     return (
-        <div>
-            <div>
-                <h2>{name || "Restaurant Menu"}</h2>
-                {address && <p>{address}</p>}
-                {phone && <p>{phone}</p>}
-                <Link to={`/${camis}/menu/upload`} state={state}>
-                    Upload Menu
-                </Link>
+        <div className="menu-page-container">
+            <div className="menu-page-header">
+                <span className="menu-page-label">Restaurant Menu</span>
+                <h2 className="menu-page-title">{name || "Restaurant Menu"}</h2>
+                {address && <p className="menu-page-meta">{address}</p>}
+                {phone && <p className="menu-page-meta">{phone}</p>}
+                <div style={{ display: 'flex', gap: '16px' }}>
+                    <Link to={`/${camis}/menu/upload`} state={state} className="menu-page-link">
+                        Upload Menu →
+                    </Link>
+                    <Link to="/map/restaurant" className="menu-page-link">
+                        ← Back to Restaurant Map
+                    </Link>
+                </div>
             </div>
-            <div>{isLoading ? <p>Loading...</p> : <div>{menus}</div>}</div>
+            <div>
+                {isLoading ? (
+                    <p className="menu-loading">Loading...</p>
+                ) : menus?.length === 0 ? (
+                    <p className="menu-empty">No menus uploaded yet.</p>
+                ) : (
+                    <div>{menus}</div>
+                )}
+            </div>
         </div>
     );
 };
