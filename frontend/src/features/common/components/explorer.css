@@ -1,7 +1,7 @@
 .restaurant-page-container,
 .pantry-page-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 80%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -96,6 +96,21 @@
   font-size: 0.8rem;
 }
 
+.filter-groups-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.filter-groups-row .restaurant-filter-group:first-child {
+  flex: 3;
+}
+
+.filter-groups-row .restaurant-filter-group:last-child {
+  flex: 1;
+}
+
 .restaurant-filters-panel,
 .restaurant-filter-group,
 .pantry-filters-panel,
@@ -164,6 +179,8 @@
 .restaurant-filter-chip:hover,
 .pantry-filter-chip:hover {
   border-color: #8b3dff;
+  background: #d7bdfa !important;
+
 }
 
 .restaurant-filter-chip.is-selected,
@@ -225,9 +242,32 @@
 .results-list-panel {
   display: grid;
   gap: 4px;
-  max-height: 224px;
+  max-height: 152px;
   overflow-y: auto;
   padding-right: 4px;
+}
+
+.search-inputs-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.search-inputs-row > div {
+  flex: 1;
+}
+
+/* Force both wrappers to the same height as the ZIP input (geo button drives it to 50px) */
+.search-inputs-row .pantry-input-wrapper,
+.search-inputs-row .restaurant-name-input-wrapper {
+  min-height: 50px;
+}
+
+/* Shrink geo button inside search row so it doesn't inflate the ZIP wrapper */
+.search-inputs-row .pantry-geo-button-sq {
+  width: 36px;
+  height: 36px;
 }
 
 .location-list-card {
@@ -246,6 +286,13 @@
   box-shadow: 0 6px 18px rgba(139, 61, 255, 0.18);
 }
 
+.location-list-card:hover {
+  border-color: rgba(139, 61, 255, 0.18);
+  box-shadow: 0 6px 18px rgba(222, 74, 74, 0.15);
+  background: #d7bdfa !important;
+ 
+}
+
 .load-more-button {
   border: 1px solid #d7d7d7;
   border-radius: 12px;
@@ -260,6 +307,7 @@
 .load-more-button:hover,
 .load-more-button:focus-visible {
   border-color: #8b3dff;
+  color: #d3b7fe !important;
   box-shadow: 0 4px 12px rgba(139, 61, 255, 0.12);
 }
 

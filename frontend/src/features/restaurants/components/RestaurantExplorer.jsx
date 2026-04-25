@@ -13,6 +13,7 @@ const DIRECT_PIN_RENDER_THRESHOLD = 1200;
 const DEFERRED_CLUSTER_RENDER_THRESHOLD = 4000;
 const RESTAURANT_LIST_PAGE_SIZE = 50;
 const SELECTED_LOCATION_ZOOM = 17;
+
 const RestaurantExplorer = () => {
     const { 
         restaurants = [], 
@@ -49,7 +50,6 @@ const RestaurantExplorer = () => {
 
     useEffect(() => {
         if (!fetchAll) return;
-
         fetchAll();
     }, [fetchAll]);
 
@@ -57,18 +57,15 @@ const RestaurantExplorer = () => {
         if (!fetchAll) return;
         if (committedZip) return;
         if (loading || error || restaurants.length > 0) return;
-
         fetchAll();
     }, [committedZip, error, fetchAll, loading, restaurants.length]);
 
     const cuisineOptions = useMemo(() => {
         const counts = new Map();
-
         for (const restaurant of restaurants) {
             const cuisineGroup = getCuisineGroup(restaurant.cuisine);
             counts.set(cuisineGroup, (counts.get(cuisineGroup) || 0) + 1);
         }
-
         return [...counts.entries()]
             .sort((a, b) => {
                 if (a[0] === 'Other') return 1;
@@ -116,39 +113,26 @@ const RestaurantExplorer = () => {
 
     const filteredRestaurants = useMemo(() => {
         const normalizedQuery = nameQuery.trim().toLowerCase();
-
         return restaurants.filter((restaurant) => {
-            if (committedZip.length === 5 && restaurant.zipcode !== committedZip) {
-                return false;
-            }
-
+            if (committedZip.length === 5 && restaurant.zipcode !== committedZip) return false;
             if (normalizedQuery) {
                 const matchesName = restaurant.name?.toLowerCase().includes(normalizedQuery);
                 const matchesAddress = restaurant.address?.toLowerCase().includes(normalizedQuery);
                 if (!matchesName && !matchesAddress) return false;
             }
-
-            if (selectedCuisines.length > 0 && !selectedCuisines.includes(getCuisineGroup(restaurant.cuisine))) {
-                return false;
-            }
-
-            if (selectedGrades.length > 0 && !selectedGrades.includes(restaurant.grade)) {
-                return false;
-            }
-
+            if (selectedCuisines.length > 0 && !selectedCuisines.includes(getCuisineGroup(restaurant.cuisine))) return false;
+            if (selectedGrades.length > 0 && !selectedGrades.includes(restaurant.grade)) return false;
             return true;
         });
     }, [committedZip, nameQuery, restaurants, selectedCuisines, selectedGrades]);
 
     const sortedRestaurants = useMemo(() => {
-        const restaurantsWithDistance = sortItemsByDistance(
+        return sortItemsByDistance(
             filteredRestaurants,
             userCoords,
             (restaurant) => ({ lat: restaurant.latitude, lng: restaurant.longitude }),
             sortByProximity
         );
-
-        return restaurantsWithDistance;
     }, [filteredRestaurants, sortByProximity, userCoords]);
 
     const selectedRestaurant = useMemo(
@@ -185,14 +169,9 @@ const RestaurantExplorer = () => {
     const derivedMapTarget = useMemo(() => {
         if (mapTarget) return mapTarget;
         if (loading || sortedRestaurants.length === 0) return null;
-
         const first = sortedRestaurants[0];
         if (!first?.latitude || !first?.longitude) return null;
-
-        return {
-            lat: Number(first.latitude),
-            lng: Number(first.longitude)
-        };
+        return { lat: Number(first.latitude), lng: Number(first.longitude) };
     }, [loading, mapTarget, sortedRestaurants]);
 
     const handleSelectRestaurant = (restaurant) => {
@@ -210,7 +189,6 @@ const RestaurantExplorer = () => {
             setSortByProximity((current) => !current);
             return;
         }
-
         const coords = await handleMyLocation();
         if (coords) {
             setVisibleRestaurantCount(RESTAURANT_LIST_PAGE_SIZE);
@@ -230,24 +208,29 @@ const RestaurantExplorer = () => {
     return (
         <div className="restaurant-page-container">
             <div className="restaurant-search-section">
-                <div className="header-flex">
-                    <span className="pantry-search-title">RESTAURANT EXPLORER</span>
+                <span className="pantry-search-title">RESTAURANT EXPLORER</span>
+
+                {/* ── ROW 1: ZIP search + Name search side by side ── */}
+            <div className="search-inputs-row">
+                <div className="restaurant-filter-group">
+                    <label className="restaurant-filter-label">Search by ZIP Code</label>
+                    <ZipSearchInput
+                        inputRef={inputRef}
+                        onChange={handleZipChange}
+                        onSearch={handleSearch}
+                        onGeoClick={handleMyLocation}
+                        loading={geoLoading || loading}
+                        error={zipError || error}
+                    />
                 </div>
-
-                <ZipSearchInput 
-                    inputRef={inputRef}
-                    onChange={handleZipChange}
-                    onSearch={handleSearch}
-                    onGeoClick={handleMyLocation}
-                    loading={geoLoading || loading}
-                    error={zipError || error}
-                />
-
-                <div className="restaurant-filters-panel">
-                    <div className="restaurant-filter-group">
-                        <label htmlFor="restaurant-name-search" className="restaurant-filter-label">
-                            Search Restaurants
-                        </label>
+                <div className="restaurant-filter-group">
+                    <label htmlFor="restaurant-name-search" className="restaurant-filter-label">
+                        Search Restaurants
+                    </label>
+                    <div className="restaurant-name-input-wrapper">
+                        <div className="pantry-search-button-sq" onClick={() => document.getElementById('restaurant-name-search').focus()}>
+                            🔍
+                        </div>
                         <input
                             id="restaurant-name-search"
                             type="text"
@@ -257,42 +240,47 @@ const RestaurantExplorer = () => {
                             placeholder="Search by restaurant name or address"
                         />
                     </div>
+                </div>
+            </div>
 
-                    {cuisineOptions.length > 0 && (
-                        <div className="restaurant-filter-group">
-                            <span className="restaurant-filter-label">Cuisine</span>
-                            <div className="restaurant-filter-chip-row">
-                                {cuisineOptions.map((cuisine) => (
-                                    <button
-                                        key={cuisine}
-                                        type="button"
-                                        className={`restaurant-filter-chip ${selectedCuisines.includes(cuisine) ? 'is-selected' : ''}`}
-                                        onClick={() => toggleSelection(cuisine, setSelectedCuisines)}
-                                    >
-                                        {cuisine}
-                                    </button>
-                                ))}
+                <div className="restaurant-filters-panel">
+                    {/* ── ROW 2: Cuisine + Grade side by side ── */}
+                    <div className="filter-groups-row">
+                        {cuisineOptions.length > 0 && (
+                            <div className="restaurant-filter-group">
+                                <span className="restaurant-filter-label">Cuisine</span>
+                                <div className="restaurant-filter-chip-row">
+                                    {cuisineOptions.map((cuisine) => (
+                                        <button
+                                            key={cuisine}
+                                            type="button"
+                                            className={`restaurant-filter-chip ${selectedCuisines.includes(cuisine) ? 'is-selected' : ''}`}
+                                            onClick={() => toggleSelection(cuisine, setSelectedCuisines)}
+                                        >
+                                            {cuisine}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-
-                    {gradeOptions.length > 0 && (
-                        <div className="restaurant-filter-group">
-                            <span className="restaurant-filter-label">Inspection Grade</span>
-                            <div className="restaurant-filter-chip-row">
-                                {gradeOptions.map((grade) => (
-                                    <button
-                                        key={grade}
-                                        type="button"
-                                        className={`restaurant-filter-chip ${selectedGrades.includes(grade) ? 'is-selected' : ''}`}
-                                        onClick={() => toggleSelection(grade, setSelectedGrades)}
-                                    >
-                                        {grade}
-                                    </button>
-                                ))}
+                        )}
+                        {gradeOptions.length > 0 && (
+                            <div className="restaurant-filter-group">
+                                <span className="restaurant-filter-label">Inspection Grade</span>
+                                <div className="restaurant-filter-chip-row">
+                                    {gradeOptions.map((grade) => (
+                                        <button
+                                            key={grade}
+                                            type="button"
+                                            className={`restaurant-filter-chip ${selectedGrades.includes(grade) ? 'is-selected' : ''}`}
+                                            onClick={() => toggleSelection(grade, setSelectedGrades)}
+                                        >
+                                            {grade}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <div className="restaurant-filter-footer">
                         <span className="restaurant-results-count">
@@ -362,12 +350,11 @@ const RestaurantExplorer = () => {
                         <p>Loading {restaurants.length === 0 ? 'City Data' : 'Clusters'}...</p>
                     </div>
                 )}
-
-                <RestaurantMap 
+                <RestaurantMap
                     restaurants={visibleRestaurants}
                     selectedRestaurant={selectedRestaurant}
                     shouldClusterPins={shouldClusterPins}
-                    target={derivedMapTarget} 
+                    target={derivedMapTarget}
                 />
             </div>
         </div>
