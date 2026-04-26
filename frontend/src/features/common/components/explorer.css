@@ -185,9 +185,7 @@
 
 .restaurant-filter-chip:hover,
 .pantry-filter-chip:hover {
-  border-color: #8b3dff;
-  background: #d7bdfa !important;
-
+  background: #f2e9ff !important;
 }
 
 .restaurant-filter-chip.is-selected,
@@ -295,9 +293,8 @@
 
 .location-list-card:hover {
   border-color: rgba(139, 61, 255, 0.18);
-  box-shadow: 0 6px 18px rgba(222, 74, 74, 0.15);
-  background: #d7bdfa !important;
- 
+  box-shadow: 0 6px 18px rgba(139, 61, 255, 0.15);
+  background: #f2e9ff !important;
 }
 
 .load-more-button {
@@ -314,7 +311,7 @@
 .load-more-button:hover,
 .load-more-button:focus-visible {
   border-color: #8b3dff;
-  color: #d3b7fe !important;
+  background: #f2e9ff;
   box-shadow: 0 4px 12px rgba(139, 61, 255, 0.12);
 }
 
@@ -512,6 +509,22 @@
   margin-top: 6px;
 }
 
+.rpc-action-link,
+.rpc-action-link:link,
+.rpc-action-link:visited,
+.rpc-action-link:hover,
+.rpc-action-link:active,
+.rpc-action-link:focus {
+  color: #8b3dff;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rpc-action-link:hover {
+  color: #6a2cc7;
+  text-decoration: underline;
+}
+
 .rpc-links {
   display: flex;
   flex-direction: column;
@@ -537,6 +550,13 @@
 .rpc-action-link:hover,
 .rpc-action-link:focus-visible {
   text-decoration: underline;
+  color: #6a2cc7;
+}
+
+.rpc-action-link:focus,
+.rpc-action-link:active {
+  outline: none;
+  color: #6a2cc7;
 }
 
 .geo-icon-svg,
