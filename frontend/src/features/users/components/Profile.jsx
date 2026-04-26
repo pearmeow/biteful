@@ -2,6 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { drogonClient } from "../../../api/client";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
+import fatPigeon from "../../../assets/fat_pigeon.png";
+import healthyPigeon from "../../../assets/healthy_pigeon.png";
+import superHealthyPigeon from "../../../assets/super_healthy_pigeon.png";
 
 const Profile = () => {
   const nav = useNavigate();
@@ -68,10 +71,9 @@ const Profile = () => {
   if (!user) return <div className="loading">Loading Biteful Dashboard...</div>;
 
   const getPigeonMessage = () => {
-    if (user.health_score < -20)
-      return "pigeon: if score under -20 then pigeon is fat";
-    if (user.health_score > 100) return "pigeon: your pigeon is becoming a god";
-    return "pigeon: your pigeon is doing okay";
+    if (user.health_score < -50) return fatPigeon;
+    if (user.health_score > 100) return superHealthyPigeon;
+    return healthyPigeon;
   };
 
   return (
@@ -84,7 +86,11 @@ const Profile = () => {
           <p className="email-subtext">{user.email}</p>
         </header>
         <div className="pigeon-card">
-          <p className="pigeon-text">{getPigeonMessage()}</p>
+          <img 
+            src={getPigeonMessage()} 
+            alt="Pigeon Status" 
+            className="pigeon-image" 
+          />
         </div>
       </div>
 

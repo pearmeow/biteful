@@ -18,7 +18,7 @@ VALUES (
 -- 4. Insert food items (using the subquery method from before)
 INSERT INTO food_items (menu_id, dish_name, health_points, menu_section, price)
 VALUES 
-    ((SELECT id FROM menus WHERE restaurant_id = 999999999 LIMIT 1), 'Avocado Smash', -30, 'Breakfast', 14.50),
+    ((SELECT id FROM menus WHERE restaurant_id = 999999999 LIMIT 1), 'Avocado Smash', 120, 'Breakfast', 14.50),
     ((SELECT id FROM menus WHERE restaurant_id = 999999999 LIMIT 1), 'Classic Burger', -10, 'Main', 16.00),
     ((SELECT id FROM menus WHERE restaurant_id = 999999999 LIMIT 1), 'Kale Salad', 20, 'Salads', 12.00);
 

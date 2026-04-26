@@ -50,6 +50,24 @@ section {
   margin-bottom: 30px;
 }
 
+.pigeon-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  min-height: 250px; 
+}
+
+.pigeon-image {
+  width: 250px;
+  height: auto;
+  display: block;
+}
+
+.pigeon-image:hover {
+  transform: scale(1.1) rotate(2deg);
+}
+
 /* --- Identity Section --- */
 .identity-card h1 {
   margin: 0;
