@@ -59,6 +59,7 @@ void FoodItems::get(const HttpRequestPtr& req, std::function<void(const HttpResp
             "SELECT * FROM food_items JOIN menus ON food_items.menu_id = menus.id WHERE restaurant_id = $1 ORDER "
             "BY menus.rating DESC",
             restaurantId);
+        LOG_INFO << "the restaurantId is " << restaurantId;
         Json::Value totalFoodItems;
         // set the values in the return json
         int lastMenu = -1;
@@ -78,7 +79,12 @@ void FoodItems::get(const HttpRequestPtr& req, std::function<void(const HttpResp
             }
             currMenu.append(currItem);
         }
+        if (!result.empty()) {
+            // for the last menu
+            totalFoodItems.append(Json::Value(currMenu));
+        }
         // return json with all the food items in the menu
+        LOG_INFO << "food items" << totalFoodItems.toStyledString();
         callback(HttpResponse::newHttpJsonResponse(totalFoodItems));
     } catch (std::exception& e) {
         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));

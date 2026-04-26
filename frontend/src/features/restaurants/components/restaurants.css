@@ -5,26 +5,36 @@
   line-height: 1.4;
 }
 
-.restaurant-name-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 11px 14px;
+.restaurant-name-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #fff;
   border: 1px solid #d7d7d7;
   border-radius: 10px;
-  background: #fff;
-  color: #2d0066;
-  font-size: 0.95rem;
+  padding: 4px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.restaurant-name-input-wrapper:focus-within {
+  border-color: #8b3dff;
+}
+
+.restaurant-name-input {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 0 !important;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
   font-weight: 500;
+  color: #8b3dff;
 }
 
 .restaurant-name-input::placeholder {
-  color: #9d96b3;
-}
-
-.restaurant-name-input:focus {
-  outline: none;
-  border-color: #8b3dff;
-  box-shadow: 0 0 0 3px rgba(139, 61, 255, 0.12);
+  color: #c2b2ff;
 }
 
 .rpc-name {
