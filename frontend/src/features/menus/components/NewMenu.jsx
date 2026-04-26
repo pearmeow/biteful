@@ -59,8 +59,8 @@ const NewMenu = ({ restaurantId, items, setItems, restaurantState }) => {
                     <label>
                         Price
                         <input
-                            name={"price"}
-                            defaultValue={item["price"]}
+                            name={"dish_price"}
+                            defaultValue={item["dish_price"]}
                             onChange={onChange}
                         />
                     </label>
