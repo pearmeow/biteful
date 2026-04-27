@@ -8,6 +8,8 @@
   
   --border-radius-lg: 12px;
   --border-radius-sm: 8px;
+  --profile-row-gap: 30px;
+  --profile-top-gap: 0px;
   
   --bold-shadow: 4px 4px 0px 0px var(--primary-purple);
   --btn-shadow: 2px 2px 0px 0px var(--dark-purple);
@@ -16,10 +18,11 @@
 
 /* --- Layout Containers --- */
 .profile-container {
-  max-width: 1100px;
-  margin: 40px auto;
+  width: 100%;
+  max-width: 80%;
+  margin: 40px auto 0;
   font-family: 'Inter', sans-serif;
-  padding: 0 20px;
+  padding: 0;
   color: #333;
 }
 
@@ -27,16 +30,30 @@
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 20px;
-  margin-bottom: 30px;
+  margin-bottom: var(--profile-top-gap);
 }
 
 .profile-main-grid {
   display: flex;
-  gap: 30px;
+  flex-direction: column;
+  gap: var(--profile-row-gap);
 }
 
-.left-column { flex: 2; }
-.right-column { flex: 1; }
+.profile-content-row {
+  display: grid;
+  gap: 24px;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.profile-content-row-top {
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+}
+
+.profile-content-row-bottom {
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+}
 
 /* --- Base Component: The Card --- */
 .identity-card, 
@@ -48,6 +65,13 @@ section {
   padding: 20px;
   box-shadow: var(--bold-shadow);
   margin-bottom: 30px;
+}
+
+.profile-content-row section {
+  margin-bottom: 0;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .pigeon-card {
@@ -88,18 +112,19 @@ section {
   display: flex;
   justify-content: space-between; 
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 18px;
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
+  align-content: start;
 }
 
 .info-item {
   background: var(--bg-light-purple);
-  padding: 18px;
+  padding: 14px 16px;
   border-radius: 10px;
   border: 1px solid rgba(138, 63, 252, 0.1);
 }
@@ -116,28 +141,29 @@ section {
 /* --- Points & Stats Sidebar --- */
 .total-points-box {
   text-align: center;
-  padding: 20px;
+  padding: 14px 16px;
   background: var(--bg-light-purple);
   border-radius: var(--border-radius-sm);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   border: 1px solid rgba(138, 63, 252, 0.1);
 }
 
 .big-number {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 800;
   color: var(--primary-purple);
   display: block;
   line-height: 1;
+  margin-bottom: 8px;
 }
 
 .stat-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
+  padding: 10px 14px;
   border-radius: var(--border-radius-sm);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   font-weight: 800;
   text-transform: lowercase;
   box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.05);
@@ -156,6 +182,13 @@ section {
   background: #fdfbff;
   border: 1px solid #eee;
   border-radius: 10px;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
 }
 
 /* --- Buttons & Actions --- */
@@ -279,4 +312,195 @@ section {
   outline: none;
   background-color: #fdfbff;
   box-shadow: 0 0 5px rgba(138, 63, 252, 0.3);
+}
+
+.progress-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.progress-card-subtitle {
+  margin: 8px 0 0;
+  color: #666;
+}
+
+.progress-card,
+.recent-activity-card,
+.personal-info-card,
+.stats-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-card {
+  justify-content: flex-start;
+}
+
+.timeframe-toggle {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.progress-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.timeframe-btn,
+.chart-label,
+.download-chart-btn {
+  border: 2px solid var(--primary-purple);
+  background: white;
+  color: var(--primary-purple);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.timeframe-btn.active,
+.chart-label.active {
+  background: var(--primary-purple);
+  color: white;
+}
+
+.download-chart-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.progress-chart-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.progress-chart-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.progress-chart-summary > div {
+  background: var(--bg-light-purple);
+  border: 1px solid rgba(138, 63, 252, 0.15);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.chart-summary-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.progress-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  background:
+    linear-gradient(180deg, rgba(138, 63, 252, 0.08), rgba(138, 63, 252, 0.02)),
+    white;
+  border-radius: 14px;
+  border: 1px solid rgba(138, 63, 252, 0.12);
+}
+
+.chart-axis {
+  stroke: rgba(90, 30, 194, 0.35);
+  stroke-width: 2;
+}
+
+.chart-line {
+  stroke: var(--primary-purple);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-guide {
+  stroke: rgba(138, 63, 252, 0.15);
+  stroke-width: 2;
+}
+
+.chart-point {
+  fill: white;
+  stroke: var(--primary-purple);
+  stroke-width: 3;
+  transition: r 0.15s ease;
+}
+
+.chart-point-group {
+  cursor: pointer;
+}
+
+.chart-point.active {
+  fill: var(--primary-purple);
+}
+
+.progress-chart-labels {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.chart-label {
+  font-size: 0.8rem;
+}
+
+.progress-chart-empty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #fdfbff;
+  color: #666;
+  border: 1px dashed rgba(138, 63, 252, 0.3);
+  text-align: center;
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .profile-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-container {
+    max-width: calc(100% - 40px);
+    padding: 0;
+  }
+
+  .profile-content-row-top,
+  .profile-content-row-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-card-header {
+    flex-direction: column;
+  }
+
+  .progress-controls {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    max-width: calc(100% - 24px);
+  }
+
+  .info-grid,
+  .progress-chart-summary {
+    grid-template-columns: 1fr;
+  }
 }
