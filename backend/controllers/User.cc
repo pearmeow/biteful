@@ -11,6 +11,24 @@ bool isValidId(const std::string& id) {
     return *end == '\0' && val >= 0;
 }
 
+Json::Value buildProgressSeries(const drogon::orm::Result& rows) {
+    Json::Value series(Json::arrayValue);
+    int runningTotal = 0;
+
+    for (const auto& row : rows) {
+        const int points = row["points"].as<int>();
+        runningTotal += points;
+
+        Json::Value entry;
+        entry["label"] = row["label"].as<std::string>();
+        entry["points"] = points;
+        entry["cumulative_points"] = runningTotal;
+        series.append(entry);
+    }
+
+    return series;
+}
+
 // POST /users
 // create account (fr1.1)
 void User::create(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
@@ -114,7 +132,7 @@ void User::getOne(const HttpRequestPtr& req,
                         "WHERE fl.user_id = $1 "
                         "ORDER BY fl.logged_at DESC "
                         "LIMIT 20",
-                        [callback, user](const drogon::orm::Result& logs) mutable {
+                        [callback, dbClient, userId, user](const drogon::orm::Result& logs) mutable {
                             Json::Value logArray(Json::arrayValue);
 
                             for (const auto& row : logs) {
@@ -127,9 +145,96 @@ void User::getOne(const HttpRequestPtr& req,
 
                             user["food_logs"] = logArray;
 
-                            auto resp = HttpResponse::newHttpJsonResponse(user);
-                            resp->setStatusCode(k200OK);
-                            callback(resp);
+                            dbClient->execSqlAsync(
+                                "WITH buckets AS ( "
+                                "    SELECT generate_series( "
+                                "        current_date - interval '13 days', "
+                                "        current_date, "
+                                "        interval '1 day' "
+                                "    )::date AS bucket_start "
+                                ") "
+                                "SELECT to_char(bucket_start, 'Mon DD') AS label, "
+                                "       COALESCE(SUM(fi.health_points), 0) AS points "
+                                "FROM buckets "
+                                "LEFT JOIN food_logs fl "
+                                "  ON fl.user_id = $1 "
+                                " AND fl.logged_at >= bucket_start "
+                                " AND fl.logged_at < bucket_start + interval '1 day' "
+                                "LEFT JOIN food_items fi ON fl.food_item_id = fi.id "
+                                "GROUP BY bucket_start "
+                                "ORDER BY bucket_start",
+                                [callback, dbClient, userId, user](const drogon::orm::Result& dailyRows) mutable {
+                                    user["progress"]["daily"] = buildProgressSeries(dailyRows);
+
+                                    dbClient->execSqlAsync(
+                                        "WITH buckets AS ( "
+                                        "    SELECT generate_series( "
+                                        "        date_trunc('week', current_date) - interval '11 weeks', "
+                                        "        date_trunc('week', current_date), "
+                                        "        interval '1 week' "
+                                        "    ) AS bucket_start "
+                                        ") "
+                                        "SELECT to_char(bucket_start, 'Mon DD') AS label, "
+                                        "       COALESCE(SUM(fi.health_points), 0) AS points "
+                                        "FROM buckets "
+                                        "LEFT JOIN food_logs fl "
+                                        "  ON fl.user_id = $1 "
+                                        " AND fl.logged_at >= bucket_start "
+                                        " AND fl.logged_at < bucket_start + interval '1 week' "
+                                        "LEFT JOIN food_items fi ON fl.food_item_id = fi.id "
+                                        "GROUP BY bucket_start "
+                                        "ORDER BY bucket_start",
+                                        [callback, dbClient, userId, user](const drogon::orm::Result& weeklyRows) mutable {
+                                            user["progress"]["weekly"] = buildProgressSeries(weeklyRows);
+
+                                            dbClient->execSqlAsync(
+                                                "WITH buckets AS ( "
+                                                "    SELECT generate_series( "
+                                                "        date_trunc('month', current_date) - interval '11 months', "
+                                                "        date_trunc('month', current_date), "
+                                                "        interval '1 month' "
+                                                "    ) AS bucket_start "
+                                                ") "
+                                                "SELECT to_char(bucket_start, 'Mon YYYY') AS label, "
+                                                "       COALESCE(SUM(fi.health_points), 0) AS points "
+                                                "FROM buckets "
+                                                "LEFT JOIN food_logs fl "
+                                                "  ON fl.user_id = $1 "
+                                                " AND fl.logged_at >= bucket_start "
+                                                " AND fl.logged_at < bucket_start + interval '1 month' "
+                                                "LEFT JOIN food_items fi ON fl.food_item_id = fi.id "
+                                                "GROUP BY bucket_start "
+                                                "ORDER BY bucket_start",
+                                                [callback, user](const drogon::orm::Result& monthlyRows) mutable {
+                                                    user["progress"]["monthly"] = buildProgressSeries(monthlyRows);
+
+                                                    auto resp = HttpResponse::newHttpJsonResponse(user);
+                                                    resp->setStatusCode(k200OK);
+                                                    callback(resp);
+                                                },
+                                                [callback](const drogon::orm::DrogonDbException& e) {
+                                                    LOG_ERROR << "Monthly Progress Error: " << e.base().what();
+                                                    auto resp = HttpResponse::newHttpResponse();
+                                                    resp->setStatusCode(k500InternalServerError);
+                                                    callback(resp);
+                                                },
+                                                userId);
+                                        },
+                                        [callback](const drogon::orm::DrogonDbException& e) {
+                                            LOG_ERROR << "Weekly Progress Error: " << e.base().what();
+                                            auto resp = HttpResponse::newHttpResponse();
+                                            resp->setStatusCode(k500InternalServerError);
+                                            callback(resp);
+                                        },
+                                        userId);
+                                },
+                                [callback](const drogon::orm::DrogonDbException& e) {
+                                    LOG_ERROR << "Daily Progress Error: " << e.base().what();
+                                    auto resp = HttpResponse::newHttpResponse();
+                                    resp->setStatusCode(k500InternalServerError);
+                                    callback(resp);
+                                },
+                                userId);
                         },
                         [callback](const drogon::orm::DrogonDbException& e) {
                             LOG_ERROR << "Logs Error: " << e.base().what();
