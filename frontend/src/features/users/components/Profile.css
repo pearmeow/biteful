@@ -178,10 +178,21 @@ section {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  margin-bottom: 15px;
   background: #fdfbff;
   border: 1px solid #eee;
   border-radius: 10px;
+}
+
+.recent-activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.recent-activity-header h2 {
+  margin: 0;
 }
 
 .activity-list {
@@ -189,6 +200,37 @@ section {
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+}
+
+.activity-pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activity-pager-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--primary-purple);
+  border-radius: 999px;
+  background: white;
+  color: var(--primary-purple);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.activity-pager-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.activity-pager-label {
+  min-width: 52px;
+  text-align: center;
+  color: #5f6368;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 /* --- Buttons & Actions --- */

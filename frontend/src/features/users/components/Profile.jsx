@@ -14,6 +14,38 @@ const TIMEFRAME_OPTIONS = [
 const CHART_WIDTH = 560;
 const CHART_HEIGHT = 240;
 const CHART_PADDING = 24;
+const RECENT_ACTIVITY_PAGE_SIZE = 5;
+const CHART_EXPORT_STYLES = `
+  .progress-chart {
+    display: block;
+    background: linear-gradient(180deg, rgba(138, 63, 252, 0.08), rgba(138, 63, 252, 0.02)), white;
+    border-radius: 14px;
+    border: 1px solid rgba(138, 63, 252, 0.12);
+  }
+  .chart-axis {
+    stroke: rgba(90, 30, 194, 0.35);
+    stroke-width: 2;
+  }
+  .chart-line {
+    stroke: #8a3ffc;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+  .chart-guide {
+    stroke: rgba(138, 63, 252, 0.15);
+    stroke-width: 2;
+  }
+  .chart-point {
+    fill: white;
+    stroke: #8a3ffc;
+    stroke-width: 3;
+  }
+  .chart-point.active {
+    fill: #8a3ffc;
+  }
+`;
 
 const buildChartGeometry = (data) => {
   if (!data.length) {
@@ -159,6 +191,7 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState("daily");
+  const [activityPage, setActivityPage] = useState(0);
   const [formData, setFormData] = useState({
     display_name: "",
     phone: "",
@@ -171,6 +204,7 @@ const Profile = () => {
       .getProfile(userId)
       .then((data) => {
         setUser(data);
+        setActivityPage(0);
         setFormData({
           display_name: data.display_name || "",
           phone: data.phone || "",
@@ -233,8 +267,19 @@ const Profile = () => {
       return;
     }
 
+    const svgClone = svgElement.cloneNode(true);
+    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svgClone.setAttribute("width", String(CHART_WIDTH));
+    svgClone.setAttribute("height", String(CHART_HEIGHT));
+
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+    style.textContent = CHART_EXPORT_STYLES;
+    defs.appendChild(style);
+    svgClone.insertBefore(defs, svgClone.firstChild);
+
     const serializer = new XMLSerializer();
-    const svgMarkup = serializer.serializeToString(svgElement);
+    const svgMarkup = serializer.serializeToString(svgClone);
     const svgBlob = new Blob([svgMarkup], {
       type: "image/svg+xml;charset=utf-8",
     });
@@ -283,6 +328,16 @@ const Profile = () => {
   };
 
   const selectedProgress = user.progress?.[selectedTimeframe] || [];
+  const activityLogs = user.food_logs || [];
+  const activityPageCount = Math.max(
+    1,
+    Math.ceil(activityLogs.length / RECENT_ACTIVITY_PAGE_SIZE),
+  );
+  const safeActivityPage = Math.min(activityPage, activityPageCount - 1);
+  const visibleActivityLogs = activityLogs.slice(
+    safeActivityPage * RECENT_ACTIVITY_PAGE_SIZE,
+    safeActivityPage * RECENT_ACTIVITY_PAGE_SIZE + RECENT_ACTIVITY_PAGE_SIZE,
+  );
 
   return (
     <div className="profile-container">
@@ -447,9 +502,38 @@ const Profile = () => {
           </section>
 
           <section className="recent-activity-card">
-            <h2>RECENT ACTIVITY</h2>
+            <div className="recent-activity-header">
+              <h2>RECENT ACTIVITY</h2>
+              <div className="activity-pager">
+                <button
+                  type="button"
+                  className="activity-pager-btn"
+                  onClick={() => setActivityPage((current) => Math.max(current - 1, 0))}
+                  disabled={safeActivityPage === 0}
+                  aria-label="Previous activity page"
+                >
+                  ←
+                </button>
+                <span className="activity-pager-label">
+                  {safeActivityPage + 1} / {activityPageCount}
+                </span>
+                <button
+                  type="button"
+                  className="activity-pager-btn"
+                  onClick={() =>
+                    setActivityPage((current) =>
+                      Math.min(current + 1, activityPageCount - 1),
+                    )
+                  }
+                  disabled={safeActivityPage >= activityPageCount - 1}
+                  aria-label="Next activity page"
+                >
+                  →
+                </button>
+              </div>
+            </div>
             <div className="activity-list">
-              {(user.food_logs || []).map((log, index) => (
+              {visibleActivityLogs.map((log, index) => (
                 <div key={index} className="activity-row">
                   <div
                     className={`icon-circle ${log.health_points >= 0 ? "pos" : "neg"}`}
