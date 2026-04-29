@@ -59,30 +59,37 @@ int main() {
         }
     }
 
+    bool localhost = getenv("LOCALHOST") != NULL;
+    std::string origin = "http://localhost:5173";
+    if (!localhost) {
+        origin = "https://pearmeow-biteful.netlify.app";
+    }
+
     drogon::app().addListener("0.0.0.0", port);
     // GLOBAL PRE-ROUTING: Handle OPTIONS before any controller or other filter
-    drogon::app().registerPreRoutingAdvice(
-        [](const drogon::HttpRequestPtr& req, drogon::AdviceCallback&& acb, drogon::AdviceChainCallback&& accb) {
-            if (req->method() == drogon::Options) {
-                auto res = drogon::HttpResponse::newHttpResponse();
-                // TODO: change this allow origin to a environment variable of where the frontend is
-                res->addHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-                res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-                // don't need authorization in here
-                res->addHeader("Access-Control-Allow-Headers", "Content-Type");
-                res->addHeader("Access-Control-Allow-Credentials", "true");
-                res->setStatusCode(drogon::k200OK);
-                acb(res);  // Short-circuit: send response now
-            } else {
-                accb();  // Continue to regular routing for GET/POST/etc
-            }
-        });
+    drogon::app().registerPreRoutingAdvice([origin](const drogon::HttpRequestPtr& req,
+                                                    drogon::AdviceCallback&& acb,
+                                                    drogon::AdviceChainCallback&& accb) {
+        if (req->method() == drogon::Options) {
+            auto res = drogon::HttpResponse::newHttpResponse();
+            // TODO: change this allow origin to a environment variable of where the frontend is
+            res->addHeader("Access-Control-Allow-Origin", origin);
+            res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+            // don't need authorization in here
+            res->addHeader("Access-Control-Allow-Headers", "Content-Type");
+            res->addHeader("Access-Control-Allow-Credentials", "true");
+            res->setStatusCode(drogon::k200OK);
+            acb(res);  // Short-circuit: send response now
+        } else {
+            accb();  // Continue to regular routing for GET/POST/etc
+        }
+    });
 
     // GLOBAL POST-HANDLING: Ensure the actual POST response also has the headers
     drogon::app().registerPostHandlingAdvice(
-        [](const drogon::HttpRequestPtr&, const drogon::HttpResponsePtr& res) {
+        [origin](const drogon::HttpRequestPtr&, const drogon::HttpResponsePtr& res) {
             // TODO: change this allow origin to a environment variable of where the frontend is
-            res->addHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+            res->addHeader("Access-Control-Allow-Origin", origin);
             res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
             // don't need authorization in here
             res->addHeader("Access-Control-Allow-Headers", "Content-Type");
