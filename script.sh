@@ -8,6 +8,7 @@ echo "Starting Biteful Setup"
 # 1. System Dependencies
 echo "Installing system dependencies"
 sudo apt update
+sudo apt upgrade
 sudo apt install -y nodejs npm postgresql postgresql-contrib libpq-dev unzip \
                     git gcc g++ cmake libjsoncpp-dev uuid-dev \
                     zlib1g-dev libssl-dev libyaml-cpp-dev libsodium-dev pkg-config
