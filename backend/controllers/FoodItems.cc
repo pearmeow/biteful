@@ -8,6 +8,7 @@
 #include "FoodItems.h"
 
 #include <drogon/HttpTypes.h>
+#include <drogon/HttpClient.h>
 #include <json/value.h>
 #include <trantor/utils/Logger.h>
 
@@ -100,6 +101,7 @@ void FoodItems::create(const HttpRequestPtr& req, std::function<void(const HttpR
     std::string menuSection(body["menu_section"].asString());
     std::string dishDesc(body["dish_description"].asString());
     std::string price(body["dish_price"].asString());
+    int itemIndex = body["item_index"].asInt();
     char* errPtr;
     int intMenuId = std::strtol(menuId.c_str(), &errPtr, 10);
     // if the id is negative the error pointer doesn't point to the end of the string
@@ -131,10 +133,140 @@ void FoodItems::create(const HttpRequestPtr& req, std::function<void(const HttpR
     }
     try {
         auto result = dbClient->execSqlSync(
-            "INSERT INTO food_items (menu_id, dish_name, menu_section, dish_desc, price) VALUES ($1, $2, $3, $4, "
-            "$5)",
-            menuId, dishName, menuSection, dishDesc, price);
+            "INSERT INTO food_items (menu_id, dish_name, menu_section, dish_desc, price, health_points) VALUES ($1, $2, $3, $4, "
+            "$5, $6) RETURNING id",
+            menuId, dishName, menuSection, dishDesc, price, 0);
         callback(HttpResponse::newHttpResponse(drogon::k200OK, CT_TEXT_PLAIN));
+
+        // Claude API health score
+        if (result.empty()) return;
+        int newId = result[0]["id"].as<int>();
+        std::string prompt = 
+        "You are a nutrition scoring system that evaluates restaurant menu items.\n"
+        "Score each dish as an integer from -10 to 10 where +10 = extremely healthy and -10 = extremely unhealthy.\n\n"
+
+        "STEP 1: CLASSIFY DISH COMPONENTS\n"
+        "Reason from nutritional principles, do not rely on example lists.\n\n"
+        "Protein: Lean/high-quality (fish, seafood, poultry, eggs, tofu, legumes, lean game) | "
+        "Whole cut red meat (steak, chop, loin, note leanness)| "
+        "Processed/fatty (bacon, sausage, salami, hot dog) | Ground meat (neutral)\n"
+        "Fat: Healthy (olive oil, avocado, nuts, fatty fish) | Unhealthy (cream, butter, lard) | "
+        "High-fat sauce (peanut sauce, coconut curry, tahini-heavy, cream sauce, aioli, ranch, mayo, alfredo)\n"
+        "Carbs: Whole (vegetables, fruits, legumes, whole grains) | Refined (white bread, white rice, pasta, chips, fries)\n"
+        "Dessert: Any item whose primary identity is sweet or dessert-based (cake, ice cream, gelato, tiramisu, mousse, churros, etc.)\n"
+        "Prep: Health-preserving (grilled, baked, steamed, roasted, poached) | "
+        "Health-degrading (fried, battered, breaded) | Light (broth-based, simmered)\n\n"
+
+        "STEP 2: APPLY SIGNAL WEIGHTS\n"
+        "Positive signals:\n"
+        "+4: Vegetables or fruits as primary ingredient\n"
+        "+4: Legumes or beans as primary ingredient\n"
+        "+4: Lean protein as primary ingredient\n"
+        "+3: Whole grains as primary ingredient\n"
+        "+2: Unprocessed whole cut red meat\n"
+        "+2: Health-preserving preparation (grilled, baked, steamed, roasted, poached)\n"
+        "+1: Broth-based or light cooking, mutually exclusive with +2 prep, take the higher\n"
+        "+1: Healthy fats or light sauces (olive oil, vinaigrette, salsa, lemon, herbs)\n\n"
+        "Negative signals:\n"
+        "-6: Dessert or high-sugar item\n"
+        "-5: Fried or breaded preparation\n"
+        "-3: High-fat sauce as dominant component\n"
+        "-3: Cheese as dominant component\n"
+        "-2: High-fat nut-based or coconut sauce\n"
+        "-2: Refined carbs as primary component\n"
+        "-2: High sodium (cured, heavily pickled, soy sauce-heavy)\n"
+        "-2: Processed or fatty red meat as primary ingredient\n"
+        "-2: Explicit oversized framing (double, triple, loaded, extra cheese)\n"
+        "-1: Cheese as minor topping, apply -1 OR -3, never both\n"
+        "-1: Processed or fatty red meat as secondary ingredient\n\n"
+
+        "STEP 3: APPLY RULES\n"
+        "1. Prep bonus (+2) and broth bonus (+1) are mutually exclusive, award only the higher.\n"
+        "2. Lean protein (+4) and healthy prep (+2) may both apply only if prep is stated or implied by dish name.\n"
+        "3. Fried or dessert items: cap score at 0 unless two or more strong positive signals (+2 or higher) are present.\n"
+        "4. Lean protein or vegetable dish with healthy prep and no major negatives: minimum score is 5.\n"
+        "5. Whole cut red meat with healthy prep and no major negatives: minimum score is 3.\n"
+        "6. For name-only dishes, infer conventional restaurant preparation from nutritional principles.\n"
+        "7. Verify before returning: desserts must score negative, lean protein with healthy prep must score moderately to strongly positive, fried items must score negative.\n\n"
+
+        "CALIBRATION ANCHORS\n"
+        "Use these to sanity-check your score before returning it:\n"
+        "8 to 10: Nutritionally exceptional - grilled salmon over greens, lentil vegetable bowl\n"
+        "5 to 7:  Strongly healthy - grilled chicken breast, poached fish, vegetable stir-fry\n"
+        "3 to 4:  Moderately healthy - whole grain dishes, lean red meat with healthy prep\n"
+        "0 to 2:  Neutral to mixed - refined carb dishes, soups with minor negatives\n"
+        "-1 to -3: Mildly to clearly unhealthy - fried items, heavy sauces, processed meat dishes\n"
+        "-4 to -6: Significantly unhealthy - desserts, heavily processed, loaded items\n"
+        "-7 to -10: Reserved for extreme cases - deep-fried desserts, pure sugar confections, items with near-zero nutritional value\n\n"
+
+        "Clamp final score between -10 and 10.\n"
+        "Return ONLY the integer score. No explanation, no extra text.\n"
+        "Be consistent: the same dish must always receive the same score.\n\n"
+        "Dish: " + dishName;
+
+    if(menuSection != "NULL") {prompt += "\nSection: " + menuSection;}
+    if(dishDesc != "NULL") {prompt += "\nDescription: " + dishDesc;}
+
+    Json::Value claudeBody;
+    claudeBody["model"] = "claude-haiku-4-5-20251001";
+    claudeBody["max_tokens"] = 16;
+    Json::Value message;
+    message["role"] = "user";
+    message["content"] = prompt;
+    claudeBody["messages"].append(message);
+
+    //Add prefill: forces model to start outputting the number immediately
+    Json::Value prefill;
+    prefill["role"] = "assistant";
+    prefill["content"] = "";
+    claudeBody["messages"].append(prefill);
+
+    const char* apiKeyEnv = std::getenv("ANTHROPIC_API_KEY");
+    std::string apiKey = apiKeyEnv ? apiKeyEnv : "";
+    if (apiKey.empty()) {
+        LOG_ERROR << "ANTHROPIC_API_KEY not set";
+        return;
+    }
+
+    auto client = drogon::HttpClient::newHttpClient("https://api.anthropic.com");
+    auto claudeReq = drogon::HttpRequest::newHttpJsonRequest(claudeBody);
+        claudeReq->setMethod(drogon::Post);
+        claudeReq->setPath("/v1/messages");
+        claudeReq->addHeader("x-api-key", apiKey);
+        claudeReq->addHeader("anthropic-version", "2023-06-01");
+    
+        double staggerDelay = itemIndex * 0.2;
+        drogon::app().getLoop()->runAfter(staggerDelay, [client, claudeReq, dbClient, newId]() {
+            client->sendRequest(claudeReq, [dbClient, newId](drogon::ReqResult res, const drogon::HttpResponsePtr& resp) {
+                if (res != drogon::ReqResult::Ok) {
+                    LOG_ERROR << "Claude API request failed";
+                    return;
+                }
+                auto respJson = resp->getJsonObject();
+                if (!respJson) return;
+
+                if ((*respJson).isMember("error")) {
+                    LOG_ERROR << "Claude API error for id " << newId << ": " << (*respJson)["error"]["message"].asString();
+                    return;
+                }
+
+                std::string text = (*respJson)["content"][0]["text"].asString();
+                // trim whitespace
+                auto start = text.find_first_not_of(" \t\n\r");
+                auto end = text.find_last_not_of(" \t\n\r");
+                if (start == std::string::npos) return;
+                text = text.substr(start, end - start + 1);
+                char* ep;
+                int score = std::strtol(text.c_str(), &ep, 10);
+                if (*ep != '\0' || score < -10 || score > 10) {
+                    LOG_ERROR << "Unexpected Claude response:" << text;
+                    return;
+                }
+                dbClient->execSqlAsync("UPDATE food_items SET health_points = $1 WHERE id = $2", [](const drogon::orm::Result&) {}, [](const drogon::orm::DrogonDbException& e) {
+                    LOG_ERROR << "Failed to update health_points: " << e.base().what();
+                }, score, newId);
+            });
+        });
     } catch (std::exception& e) {
         callback(HttpResponse::newHttpResponse(drogon::k500InternalServerError, drogon::CT_TEXT_PLAIN));
     }

@@ -38,8 +38,6 @@ namespace drogon_model
 {
 namespace biteful
 {
-class Restaurants;
-class Users;
 
 class Menus
 {
@@ -154,14 +152,6 @@ class Menus
     std::string toString() const;
     Json::Value toMasqueradedJson(const std::vector<std::string> &pMasqueradingVector) const;
     /// Relationship interfaces
-    Users getUsers(const drogon::orm::DbClientPtr &clientPtr) const;
-    void getUsers(const drogon::orm::DbClientPtr &clientPtr,
-                  const std::function<void(Users)> &rcb,
-                  const drogon::orm::ExceptionCallback &ecb) const;
-    Restaurants getRestaurants(const drogon::orm::DbClientPtr &clientPtr) const;
-    void getRestaurants(const drogon::orm::DbClientPtr &clientPtr,
-                        const std::function<void(Restaurants)> &rcb,
-                        const drogon::orm::ExceptionCallback &ecb) const;
   private:
     friend drogon::orm::Mapper<Menus>;
     friend drogon::orm::BaseBuilder<Menus, true, true>;
