@@ -47,7 +47,19 @@ void loadEnv(const std::string& path) {
 int main() {
     loadEnv("../.env");
 
-    drogon::app().addListener("0.0.0.0", 5555);
+    long port = 5555;
+    std::string strPort = std::getenv("PORT");
+    if (!strPort.empty()) {
+        char* errPtr;
+        long newPort = std::strtol(strPort.c_str(), &errPtr, 10);
+        if (newPort < 0 || *errPtr != '\0') {
+            // invalid port
+        } else {
+            port = newPort;
+        }
+    }
+
+    drogon::app().addListener("0.0.0.0", port);
     // GLOBAL PRE-ROUTING: Handle OPTIONS before any controller or other filter
     drogon::app().registerPreRoutingAdvice(
         [](const drogon::HttpRequestPtr& req, drogon::AdviceCallback&& acb, drogon::AdviceChainCallback&& accb) {
