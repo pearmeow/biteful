@@ -11,6 +11,7 @@ import Profile from "./features/users/components/Profile";
 import RestaurantExplorer from "./features/restaurants/components/RestaurantExplorer";
 import MenuViewer from "./features/menus/components/MenuViewer";
 import MenuUploader from "./features/menus/components/MenuUploader";
+import About from "./features/about/components/About";
 
 const isAuthenticated = () => {
   if (localStorage.getItem("sessionId") === null) {
@@ -89,6 +90,15 @@ const router = createBrowserRouter([
       </MainLayout>
     ),
     middleware: [isAuthenticated],
+  },
+  {
+    path: "/about",
+    element: (
+      <MainLayout>
+        <About />
+      </MainLayout>
+    ),
+    loader: isAuthenticated,
   },
 ]);
 

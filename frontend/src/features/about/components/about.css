@@ -1,0 +1,169 @@
+.about-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    background-color: #fcfaff;
+    min-height: 100vh;
+}
+
+.about-hero-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.hero-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.hero-brand-name {
+    font-size: 5rem !important;
+    font-weight: 900;
+    color: #4a148c;
+    margin: 0;
+    letter-spacing: -2px;
+}
+
+.hero-logo {
+    width: 80px;
+    height: auto;
+}
+
+.hero-slogan {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #7e3ff2;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+.vision-card {
+    width: 80%;
+    max-width: 1200px;
+}
+
+.about-card {
+    background: white;
+    border: 3px solid #7e3ff2;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 0 #4a148c;
+}
+
+.about-card-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #dcd0ff;
+    padding-bottom: 10px;
+}
+
+.about-badge {
+    color: #4a148c;
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+.about-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.about-bottom-row {
+    display: flex;
+    gap: 50px;
+    width: 80%;
+    max-width: 1200px;
+}
+
+.team-section {
+    flex: 2; 
+}
+
+.contact-section {
+    flex: 1;
+}
+
+.about-team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.team-mini-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8f5ff;
+    border: 1px solid #dcd0ff;
+    border-radius: 8px;
+}
+
+.team-icon {
+    color: #7e3ff2;
+}
+
+.contact-item {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.contact-item strong {
+    color: #4a148c;
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.about-content-container {
+    width: 80%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-card {
+    background: white;
+    border: 3px solid #7e3ff2;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 0 #4a148c;
+    width: 100%; 
+    box-sizing: border-box;
+}
+
+.about-bottom-row {
+    display: flex;
+    gap: 30px;
+    width: 100%; 
+}
+
+.team-section {
+    flex: 2;
+}
+
+.contact-section {
+    flex: 1;
+}
+
+.about-hero-header {
+    text-align: center;
+    margin-bottom: 50px;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .about-content-container {
+        width: 95%;
+    }
+    .about-bottom-row {
+        flex-direction: column;
+    }
+}

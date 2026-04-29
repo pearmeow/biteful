@@ -37,6 +37,12 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
                         >
                             PANTRY
                         </Link>
+                        <Link 
+                            to="/about" 
+                            className={`nav-link ${location.pathname === '/about' ? 'active-red' : ''}`}
+                        >
+                            ABOUT US
+                        </Link>
                     </>
                 )}
             </div>

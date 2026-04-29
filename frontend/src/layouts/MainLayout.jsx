@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import "../index.css";
 import "../features/auth/components/auth.css";
 import "../features/pantries/components/pantries.css";
+import "../features/about/components/About.css";
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
