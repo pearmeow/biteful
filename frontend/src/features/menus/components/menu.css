@@ -167,6 +167,35 @@
   font-weight: 700;
 }
 
+.menu-log-btn {
+  padding: 4px 10px;
+  border: 1.5px solid #8b3dff;
+  border-radius: 999px;
+  background: white;
+  color: #8b3dff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menu-item-hp-pos {
+  background: #f0faf0;
+  color: #2e7d32;
+}
+
+.menu-log-btn:hover {
+  background: #8b3dff;
+  color: white;
+}
+
+.menu-log-btn-done {
+  border-color: #2e7d32;
+  background: #f0faf0;
+  color: #2e7d32;
+  cursor: default;
+}
+
 /* ── Upload form ── */
 .menu-upload-section {
   display: flex;

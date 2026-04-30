@@ -47,6 +47,11 @@ void loadEnv(const std::string& path) {
 int main() {
     loadEnv("../.env");
 
+    auto getSafeEnv = [](const char* key) -> std::string {
+        char* val = std::getenv(key);
+        return (val == nullptr) ? "" : std::string(val);
+    };
+
     long port = 5555;
     std::string strPort = (std::getenv("PORT") == NULL) ? "5555" : std::getenv("PORT");
     if (!strPort.empty()) {
@@ -106,10 +111,6 @@ int main() {
     jsonFileStream >> config;
 
     // Helper lambda to safely get env vars after loadEnv has run
-    auto getSafeEnv = [](const char* key) -> std::string {
-        char* val = std::getenv(key);
-        return (val == nullptr) ? "" : std::string(val);
-    };
 
     std::string dbName = getSafeEnv("DB_NAME");
     std::string dbUser = getSafeEnv("DB_USER");
