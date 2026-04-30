@@ -57,8 +57,10 @@ void FoodItems::get(const HttpRequestPtr& req, std::function<void(const HttpResp
     auto dbClient = app().getDbClient();
     try {
         auto result = dbClient->execSqlSync(
-            "SELECT * FROM food_items JOIN menus ON food_items.menu_id = menus.id WHERE restaurant_id = $1 ORDER "
-            "BY menus.rating DESC",
+            "SELECT food_items.id, food_items.menu_id, food_items.dish_name, food_items.health_points, "
+            "food_items.menu_section, food_items.dish_desc, food_items.price, menus.rating "
+            "FROM food_items JOIN menus ON food_items.menu_id = menus.id "
+            "WHERE restaurant_id = $1 ORDER BY menus.rating DESC",
             restaurantId);
         LOG_INFO << "the restaurantId is " << restaurantId;
         Json::Value totalFoodItems;
