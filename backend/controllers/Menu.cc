@@ -52,6 +52,8 @@ void Menu::getOne(const HttpRequestPtr& req, std::function<void(const HttpRespon
 }
 
 void Menu::get(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+    // just for debug
+    LOG_INFO << "Session id is " << req->session()->sessionId() << '\n';
     auto dbClient = app().getDbClient();
     try {
         orm::Result result = dbClient->execSqlSync("SELECT * FROM menus");
