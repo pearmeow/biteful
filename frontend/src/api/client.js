@@ -7,6 +7,7 @@ export const drogonClient = async (endpoint, options = {}) => {
     const config = {
         mode: "cors", // Explicitly set CORS mode
         ...options,
+        credentials: "include",
         headers,
     };
 
