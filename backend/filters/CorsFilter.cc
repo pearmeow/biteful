@@ -10,8 +10,14 @@ void CorsFilter::doFilter(const HttpRequestPtr& req, FilterCallback&& fcb, Filte
         auto res = HttpResponse::newHttpResponse();
         res->setStatusCode(k200OK);
 
+        bool localhost = getenv("LOCALHOST") != NULL;
+        std::string origin = "http://localhost:5173";
+        if (!localhost) {
+            origin = "https://pearmeow-biteful.netlify.app";
+        }
+
         // These allow the browser to proceed with the actual POST/GET
-        res->addHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+        res->addHeader("Access-Control-Allow-Origin", origin);
         res->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
         // don't add authorization here because no jwts
         res->addHeader("Access-Control-Allow-Headers", "Content-Type");

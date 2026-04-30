@@ -6,6 +6,7 @@
  */
 
 #include "FoodItems.h"
+#include "Menus.h"
 #include <drogon/utils/Utilities.h>
 #include <string>
 
@@ -1524,4 +1525,47 @@ bool FoodItems::validJsonOfField(size_t index,
             return false;
     }
     return true;
+}
+Menus FoodItems::getMenus(const DbClientPtr &clientPtr) const {
+    static const std::string sql = "select * from menus where id = $1";
+    Result r(nullptr);
+    {
+        auto binder = *clientPtr << sql;
+        binder << *menuId_ << Mode::Blocking >>
+            [&r](const Result &result) { r = result; };
+        binder.exec();
+    }
+    if (r.size() == 0)
+    {
+        throw UnexpectedRows("0 rows found");
+    }
+    else if (r.size() > 1)
+    {
+        throw UnexpectedRows("Found more than one row");
+    }
+    return Menus(r[0]);
+}
+
+void FoodItems::getMenus(const DbClientPtr &clientPtr,
+                         const std::function<void(Menus)> &rcb,
+                         const ExceptionCallback &ecb) const
+{
+    static const std::string sql = "select * from menus where id = $1";
+    *clientPtr << sql
+               << *menuId_
+               >> [rcb = std::move(rcb), ecb](const Result &r){
+                    if (r.size() == 0)
+                    {
+                        ecb(UnexpectedRows("0 rows found"));
+                    }
+                    else if (r.size() > 1)
+                    {
+                        ecb(UnexpectedRows("Found more than one row"));
+                    }
+                    else
+                    {
+                        rcb(Menus(r[0]));
+                    }
+               }
+               >> ecb;
 }

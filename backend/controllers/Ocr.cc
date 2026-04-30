@@ -8,9 +8,11 @@
 #include <trantor/utils/Logger.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 
-const bool FAKING = true;
+// if veryfi is set then we are not faking
+const bool FAKING = std::getenv("VERYFI") != NULL;
 
 // Add definition of your processing function here
 void Ocr::upload(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {

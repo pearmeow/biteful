@@ -48,7 +48,7 @@ int main() {
     loadEnv("../.env");
 
     long port = 5555;
-    std::string strPort = std::getenv("PORT");
+    std::string strPort = (std::getenv("PORT") == NULL) ? "5555" : std::getenv("PORT");
     if (!strPort.empty()) {
         char* errPtr;
         long newPort = std::strtol(strPort.c_str(), &errPtr, 10);
